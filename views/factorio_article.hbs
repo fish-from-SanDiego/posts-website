@@ -1,0 +1,287 @@
+<div class="main__content base-layout">
+  <article class="article main__center-flow">
+    <div class="article-header">
+      <h1 class="article-header__title">Эффективный ядерный реактор в Factorio | Гайд</h1>
+    </div>
+    <section class="article-section">
+      <header class="section-header">
+        <h2 class="section-header__title">В чём проблема</h2>
+      </header>
+      <p class="article-section__text">Ядерное топливо &ndash; лучший источник энергии в Factorio,
+        позволяющий получать гигаватты энергии,
+        не
+        застраивая фабрику полями солнечных батарей или километрами конвейеров с углём. Но по сравнению с
+        бойлерами у него есть один недостаток. Бойлеры сжигают топливо по необходимости и напрямую
+        производят пар, а реактор тратит уран на нагрев себя с постоянной скоростью, при этом расходуя его
+        вхолостую, если нагрев достиг максимальных 1000&deg;C. Тепло нужно отводить по тепловым трубам до
+        теплообменников, которые уже кипятят воду (но они также имеют максимальный нагрев).
+      </p>
+      <p class="article-section__text">Значит, нужно использовать логическую сеть, чтобы следить за
+        температурой, верно? Нет, <strong class="article-section__text--strong">провода
+          к
+          реактору или трубам не подключить</strong>, так что проверить температуру реактора напрямую
+        нельзя.
+        Но
+        всё же есть способ эффективно использовать реактор: для этого придётся сделать хранилище пара и
+        подавать
+        топливо в реакторы, когда оно становится пустым.</p>
+    </section>
+    <section class="article-section">
+      <div class="section-header">
+        <h2 class="section-header__title">Что понадобится</h2>
+      </div>
+      <ul class="article-section__list unordered-list">
+        <li class="unordered-list__item">Собственно реакторы, теплообменники и тепловые трубы</li>
+        <li class="unordered-list__item">Резервуары &ndash; для заполнения хранилища</li>
+        <li class="unordered-list__item">Паровые турбины &ndash; для производства электричества</li>
+        <li class="unordered-list__item">Логистические сундуки и транспортные дроны</li>
+        <li class="unordered-list__item">Немного логики и манипуляторов</li>
+        <li class="unordered-list__item">Насосы, трубы и подстанции</li>
+      </ul>
+    </section>
+    <section class="article-section">
+      <div class="section-header">
+        <h2 class="section-header__title">Как всё работает</h2>
+      </div>
+      <p class="article-section__text">Для начала посмотрим на чертёж:</p>
+
+
+      <div class="article-section__gallery-content">
+        <a href="resources/images/nuclear_blueprint.png" data-fancybox="nuclear_blueprint"
+           class="article-section__gallery-item">
+          <img class="article-section__image" src="resources/images/nuclear_blueprint.png"
+               alt="Чертёж ядерного реактора">
+        </a>
+      </div>
+
+      <p class="article-section__text">Он состоит из 4 больших секций: производство тепла реакторами (1),
+        нагрев воды теплообменниками (2),
+        хранилище пара (3) и производство электричества турбинами (4). Вода поступает справа и
+        перекачивается
+        насосами ко второй секции, при необходимости чертёж можно изменить и подводить воду с других сторон
+        (насосы нужны для сохранения скорости потока). Вторая и четвёртая секции сделаны стандартным
+        образом,
+        так что для них можно ограничиться скриншотами без подробных объяснений.</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/turbines_close.png" data-fancybox="turbines_heat_close"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Турбины крупным планом</p>">
+          <img class="article-section__image"
+               src="resources/images/turbines_close.png"
+               alt="Турбины крупным планом">
+
+        </a>
+        <a href="resources/images/heat_exchangers_close.png" data-fancybox="turbines_heat_close"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Теплообменники крупным планом</p>">
+          <img class="article-section__image"
+               src="resources/images/heat_exchangers_close.png"
+               alt="Теплообменники крупным планом">
+        </a>
+      </div>
+
+      <p class="article-section__text">А так выглядят резервуары хранилища пара:</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/steam_tanks_close.png" data-fancybox="steam_tanks_close"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Резервуары крупным планом</p>">
+          <img class="article-section__image"
+               src="resources/images/steam_tanks_close.png"
+               alt="Резервуары крупным планом">
+        </a>
+      </div>
+      <p class="article-section__text">Все резервуары соединены в зелёную логическую сеть, которая ведётся к
+        зоне реакторов через ЛЭП. Таким
+        образом, в этой сети получаем сигнал, равный общему количеству пара в хранилище и передаём его к
+        реакторам. Но самое интересное, конечно, происходит в реакторной зоне. Рассмотрим один реактор "в
+        вакууме". В изначальном состоянии он неактивен, топлива нет:</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/reactor_init.png" data-fancybox="reactor_init"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Реактор изначально</p>">
+          <img class="article-section__image"
+               src="resources/images/reactor_init.png"
+               alt="Реактор изначально">
+        </a>
+      </div>
+      <p class="article-section__text">Если в реактор поступил один урановый элемент, реактор выделяет тепло,
+        при этом вход и выход пусты
+        (реактор работает):</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/reactor_working.png" data-fancybox="reactor_working"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Работающий реактор</p>">
+          <img class="article-section__image"
+               src="resources/images/reactor_working.png"
+               alt="Работающий реактор">
+        </a>
+      </div>
+      <p class="article-section__text">Если элемент отрабатывает и не поступает нового, то реактор переходит в
+        неактивное состояние с
+        отработанным элементом на выходе и реактор не нагревается:</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/reactor_idle.png" data-fancybox="reactor_idle"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Неактивный реактор</p>">
+          <img class="article-section__image"
+               src="resources/images/reactor_idle.png"
+               alt="Неактивный реактор">
+        </a>
+      </div>
+      <p class="article-section__text">Теперь организуем подачу топлива, зависящую от заполненности хранилища.
+        Для одного реактора схема
+        выглядит так:</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/inserters_close.png" data-fancybox="inserters_close"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Реактор</p>">
+          <img class="article-section__image"
+               src="resources/images/inserters_close.png"
+               alt="Реактор">
+        </a>
+      </div>
+      <p class="article-section__text">В сундук запроса дроны приносят урановые элементы. Верхний манипулятор
+        кладёт их в реактор.
+        Манипулятор,
+        который достаёт их из реактора,
+        подключен к той самой сети с информацией о количестве пара в хранилище. Отработанные элементы он
+        складывает в сундук активного снабжения, из которого дроны уносят их на переработку. Эти два
+        манипулятора соединены в красную "локальную" сеть, в которой им не мешают сигналы от других
+        манипуляторов других реакторов. Теперь, наконец, посмотрим на настройки манипуляторов:</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/input_inserter.png" data-fancybox="input_output"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Входной манипулятор</p>">
+          <img class="article-section__image"
+               src="resources/images/input_inserter.png"
+               alt="Входной манипулятор">
+        </a>
+        <a href="resources/images/output_inserter.png" data-fancybox="input_output"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Выходной манипулятор</p>">
+          <img class="article-section__image"
+               src="resources/images/output_inserter.png"
+               alt="Выходной манипулятор">
+        </a>
+      </div>
+      <p class="article-section__text"><strong class="article-section__text--strong">Важно переопределить
+        размеры пачек на 1</strong>, так как мы
+        кладём элементы по одному. При
+        самом
+        первом запуске
+        реактора (когда он в изначальном состоянии) первый элемент мы кладём вручную. Выходной манипулятор
+        подаёт импульс, когда
+        перекладывает отработанный элемент, и этот импульс позволяет входному однократно переложить в
+        реактор
+        следующий элемент из сундука. Поэтому следующий элемент поступает в реактор только тогда, когда из
+        него
+        убран отработанный. А достаём отработанный мы только, если количество пара в хранилище меньше
+        определённого предела <i class="article-section__text--italic">L</i>. <strong
+          class="article-section__text--strong">Предел <i class="article-section__text--italic">L</i>
+          не
+          равен максимальной вместимости
+          хранилища</strong>, пока
+        считаем, что он "дан свыше" (этот момент прояснится во время расчётов).
+      </p>
+      <p class="article-section__text">Теперь реактор либо работает (и в него не поступают новые элементы),
+        либо неактивен и держит в себе
+        один
+        отработанный элемент. Когда реактор не работает, он не нагревается, а когда работает, мы знаем, что
+        в
+        хранилище пара есть место, и реактор не нагревается впустую. Предел задаём в
+        комбинаторе, подключённом к зелёной сети:</p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/combinator_settings.png" data-fancybox="combinator_settings"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Комбинатор</p>">
+          <img class="article-section__image"
+               src="resources/images/combinator_settings.png"
+               alt="Комбинатор">
+        </a>
+      </div>
+      <p class="article-section__text">Реакторы получают бонус выработки тепла от соседства, поэтому <strong
+        class="article-section__text--strong">ставим
+        их вплотную</strong>:
+      </p>
+      <div class="article-section__gallery-content">
+        <a href="resources/images/reactors_close.png" data-fancybox="reactors_close"
+           class="article-section__gallery-item"
+           data-caption="<p class=&quot;article-section__content-caption&quot;>Реакторы крупным планом</p>">
+          <img class="article-section__image"
+               src="resources/images/reactors_close.png"
+               alt="Реакторы крупным планом">
+        </a>
+      </div>
+      <p class="article-section__text">Запускать систему нужно вручную (изначально в реакторах просто нет
+        отработанных элементов), но далее
+        при
+        наличии элементов в сундуках и воды в трубах электростанция работает автоматически.</p>
+    </section>
+    <section class="article-section">
+      <div class="section-header">
+        <h2 class="section-header__title">Расчёты</h2>
+      </div>
+      <p class="article-section__text">У нас есть крайняя ситуация, которую нужно избегать &ndash; все
+        реакторы не работают в
+        момент, когда количество пара в хранилище опускается ниже предела <i
+          class="article-section__text--italic">L</i>. Тогда они все включаются
+        и
+        станция работает в полную мощность. В этом случае нужно, чтобы реакторы за один цикл работы <strong
+          class="article-section__text--strong">не</strong> производили больше тепла, чем нужно для
+        наполнения хранилища от отметки <i class="article-section__text--italic">L</i> до полной
+        вместимости.
+      </p>
+      <p class="article-section__text">Теплотворность уранового элемента &ndash; 8 ГДж. Значит, за цикл работы
+        реактор производит столько же
+        энергии (тепла). С учётом бонусов за соседство для всех реакторов чертежа в сумме получаем 8
+        &middot; (6
+        &middot; 4 + 4
+        &middot; 3) = 288 ГДж. Теплообменник тратит 0.01 ГДж на нагрев 103 единиц пара. Тогда за цикл работы
+        реакторы заполнят хранилище на 288 / 0.01 &middot; 103 &approx; 3 000 000 пара. Значит, для этого
+        чертежа <i class="article-section__text--italic">L</i> должна быть меньше максимальной вместимости
+        хотя бы на 3M. Всего хранилище способно
+        вместить 250 &middot; 25k = 6.3M пара. Тогда <i class="article-section__text--italic">L</i> &le;
+        3.3M. В комбинаторе стоит число в 3M, что
+        удовлетворяет этому условию. Также оно достаточно велико, чтобы какое-то время в случае проблем на
+        станции электричество производилось чисто из запасов пара (несколько минут).</p>
+    </section>
+    <section class="article-section">
+      <div class="section-header">
+        <h2 class="section-header__title">Итоги</h2>
+      </div>
+      <p class="article-section__text">Теперь можно спокойно
+        <del class="article-section__text--strikethrough">устраивать Чернобыль</del>
+        строить эффективную электростанцию. А файл со строкой для импорта чертежа
+        в игру можно скачать, нажав <a class="article-section__text--link"
+                                       href="resources/textfiles/blueprint.txt" download>сюда</a>.
+      </p>
+    </section>
+  </article>
+
+  <aside class="aside main__side-flow">
+    <div class="aside__item">
+      <p class="aside__item-text"><b class="aside__item-text--bold">Может быть интересно</b>: <a
+        class="aside__item-text--link"
+        href="http://ruvserod.ru/tables/2d/"><b class="aside__item-text--bold">новая
+        публикация</b></a> на
+        научном
+        разделе сайта! <q class="aside__item-text--quoted">Ноль, целковый, полушка, четвертушка,
+          осьмушка, пудовичок, медячок, серебрячок,
+          золотничок, девятичок,
+          десятичок.</q> <cite class="aside__item-text--cite"> &ndash; Юрий Рыбников</cite>
+      </p>
+    </div>
+    <div class="aside__item">
+      <img src="resources/images/japanese_landscape.jpg" class="aside__item-image"
+           alt="красивый постер с японским пейзажем; цунами на фоне горы и солнца">
+    </div>
+    <div class="aside__item">
+      <p class="aside__item-text">
+        <span class="aside__item-text--invisible-on-hover">Наведитесь на текст &#x1f913;</span>
+      </p>
+    </div>
+  </aside>
+</div>
+<button class="centering-button main__up-button main__up-button--hidden main__up-button--rounded">
+  <img src="resources/images/up-arrow.png" class="centering-button__rounded-image" alt="кружок со стрелкой вверх">
+</button>

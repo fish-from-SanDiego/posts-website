@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Расчёт платежей кредита</title>
+    <script src="resources/js/up-button.js"></script>
+    <script src="resources/js/menu-link-current.js"></script>
+    <script src="resources/js/loan_calc.js"></script>
+    <link rel="preload" href="resources/fonts/OpenSans-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
+          crossorigin="anonymous"/>
+    <link rel="preload" href="resources/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
+          crossorigin="anonymous"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Расчёт, кредит, платежи, калькулятор">
+    <meta name="description" content="Расчёт платежей кредита">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="resources/styles/loan_calc.css">
+</head>
+
+<body class="page-body page-body--standard">
+<header class="page-header page-header--sticky-at-top page-header--page-wide">
+    <div class="page-header__inner">
+        <div class="page-header__inner-content">
+            <a href="." class="page-header__logo">
+                <img src="resources/images/logo.png" alt="IS" class="page-header__logo-image">
+            </a>
+            <nav class="page-header__menu">
+                <a href="./factorio_article.html" class="page-header__menu-link">Статьи</a>
+                <a href="./table.html" class="page-header__menu-link">Таблица</a>
+                <a href="./loan_calc.html" class="page-header__menu-link">Расчёт платежей</a>
+                <a href="./some_post.html" class="page-header__menu-link">Какой-то пост</a>
+                <a href="" class="page-header__menu-link">Что-то</a>
+            </nav>
+        </div>
+    </div>
+
+</header>
+
+<main class="main main--standard-color">
+    <div class="main__content base-layout">
+        <div class="vertical-container base-layout__item" id="loan_calc_container">
+            <form autocomplete="off" class="form vertical-container__item" id="loan_calc_form">
+                <h2 class="form__title">Расчёт ежемесячных платежей по кредиту (дифференцированные платежи)</h2>
+                <hr class="form__hr">
+                <div class="form__group">
+                    <!--                    this isn't label actually ¯\_(ツ)_/¯ -->
+                    <p class="form__label"><span class="form__label-text">Сумма кредита (от 100 до 100 млн)</span></p>
+                    <input class="form__input" type="number" min="100" max="100000000" step="0.01" name="amount"
+                           placeholder="Введите сумму"
+                           required>
+                </div>
+                <div class="form__group">
+                    <p class="form__label"><span class="form__label-text">Число месяцев (от 1 до 120)</span></p>
+                    <input class="form__input" type="number" min="1" max="120" step="1" name="monthsCount"
+                           placeholder="Введите число месяцев"
+                           required>
+                </div>
+                <div class="form__group">
+                    <p class="form__label"><span class="form__label-text">Процентная ставка (от 0 до 100%)</span>
+                    </p>
+                    <input class="form__input" type="number" min="0" max="100" step="0.01" name="rate"
+                           placeholder="Введите ставку" value="" required>
+                </div>
+                <button class="form__button form__button--submit">Рассчитать</button>
+                <button class="form__button form__button--save">Сохранить параметры</button>
+                <button class="form__button form__button--hidden form__button--load">Загрузить сохранённые параметры
+                </button>
+                <button class="form__button form__button--hidden form__button--clear">Удалить сохранённые параметры
+                </button>
+            </form>
+            <div class="vertical-container__item vertical-container__item--hidden">
+                <hr class="vertical-container__hr ">
+            </div>
+            <div class="vertical-container__item vertical-container__item--hidden">
+                <div class="table table--calc-results">
+                    <p class="table__item table__item--header">№</p>
+                    <p class="table__item table__item--header">Выплата</p>
+                    <p class="table__item table__item--header">Оставшийся долг</p>
+                    <p class="table__item ">Оставшийся долг</p>
+                    <p class="table__item ">Оставшийся долг</p>
+                    <p class="table__item ">Оставшийся долг</p>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <button class="centering-button main__up-button main__up-button--hidden main__up-button--rounded">
+        <img src="resources/images/up-arrow.png" class="centering-button__rounded-image" alt="кружок со стрелкой вверх">
+    </button>
+</main>
+
+<footer class="page-footer page-footer--page-wide">
+    <div class="page-footer__inner">
+        <div class="page-footer__inner-content vertical-container">
+            <div class="vertical-container__main-item">
+                <a class="vertical-container__main-item-link" href=".">Главная</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

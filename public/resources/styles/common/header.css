@@ -1,0 +1,14 @@
+﻿.page-header {
+    flex: 0 0;
+}
+
+.page-header--sticky-at-top {
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+
+.page-header--page-wide {
+    width: 100%;
+    box-sizing: border-box;
+}

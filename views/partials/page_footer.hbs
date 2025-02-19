@@ -1,0 +1,11 @@
+<footer class="{{footerClasses.footer}}">
+  <div class="{{footerClasses.footerInner}}">
+    <div class="{{footerClasses.footerInnerContent}}">
+      <div class="{{footerClasses.linksContainer}}">
+        {{#each footerLinks}}
+          <a class="{{../footerClasses.menuLink}}" href="{{this.url}}">{{this.text}}</a>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</footer>

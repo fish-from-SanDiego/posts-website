@@ -1,0 +1,27 @@
+﻿.main {
+    flex: 1;
+    display: flex;
+}
+
+.main--standard-color {
+    background-color: #EBF0F2;
+}
+
+.base-layout {
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.base-layout--from-left {
+    justify-content: flex-start;
+}
+
+.aside {
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+}

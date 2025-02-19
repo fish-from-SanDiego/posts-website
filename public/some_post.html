@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--suppress HtmlUnknownTag -->
+<html lang="ru">
+<head>
+    <title>Пост</title>
+    <script src="resources/js/up-button.js"></script>
+    <script src="resources/js/menu-link-current.js"></script>
+    <script type="module" src="resources/js/components/spinning_loader.js"></script>
+    <script type="module" src="resources/js/comments.js"></script>
+    <link rel="preload" href="resources/fonts/OpenSans-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
+          crossorigin="anonymous"/>
+    <link rel="preload" href="resources/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
+          crossorigin="anonymous"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="keywords" content="Пост">
+    <meta name="description" content="Пост">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="resources/styles/some_post.css">
+</head>
+
+<body class="page-body page-body--standard">
+<header class="page-header page-header--sticky-at-top page-header--page-wide">
+    <div class="page-header__inner">
+        <div class="page-header__inner-content">
+            <a href="." class="page-header__logo">
+                <img src="resources/images/logo.png" alt="IS" class="page-header__logo-image">
+            </a>
+            <nav class="page-header__menu">
+                <a href="./factorio_article.html" class="page-header__menu-link">Статьи</a>
+                <a href="./table.html" class="page-header__menu-link">Таблица</a>
+                <a href="./loan_calc.html" class="page-header__menu-link">Расчёт платежей</a>
+                <a href="./some_post.html" class="page-header__menu-link">Какой-то пост</a>
+                <a href="" class="page-header__menu-link">Что-то</a>
+            </nav>
+        </div>
+    </div>
+
+</header>
+
+<main class="main main--standard-color">
+    <div class="main__content base-layout">
+        <div class="main__center-flow vertical-container">
+            <div class="post vertical-container__item">
+                <h1 class="post__title">Какой-то важный пост о чём-то</h1>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+                <p class="post__text">Очень важный параграф</p>
+            </div>
+            <spinning-loader loader-speed="0.65"
+                             class="vertical-container__item vertical-container__item--loader"
+                             id="post-comments-loader"></spinning-loader>
+            <div class="comments vertical-container__item vertical-container__item--hidden" id="post-comments">
+            </div>
+            <div class="warning vertical-container__item vertical-container__item--hidden" id="post-comments-warning">
+                <img src="resources/images/exclamation_mark.png" alt="Восклицательный знак в треугольнике"
+                     class="warning__image">
+                <span class="warning__text">Что-то пошло не так &mdash; комментарии не загрузились</span>
+            </div>
+        </div>
+
+        <aside class="aside main__side-flow">
+            <div class="aside__item">
+                <p class="aside__item-text"><b class="aside__item-text--bold">Может быть интересно</b>: <a
+                        class="aside__item-text--link"
+                        href="http://ruvserod.ru/tables/2d/"><b class="aside__item-text--bold">новая
+                    публикация</b></a> на
+                    научном
+                    разделе сайта! <q class="aside__item-text--quoted">Ноль, целковый, полушка, четвертушка,
+                        осьмушка, пудовичок, медячок, серебрячок,
+                        золотничок, девятичок,
+                        десятичок.</q> <cite class="aside__item-text--cite"> &ndash; Юрий Рыбников</cite>
+                </p>
+            </div>
+            <div class="aside__item">
+                <img src="resources/images/japanese_landscape.jpg" class="aside__item-image"
+                     alt="красивый постер с японским пейзажем; цунами на фоне горы и солнца">
+            </div>
+            <div class="aside__item">
+                <p class="aside__item-text">
+                    <span class="aside__item-text--invisible-on-hover">Наведитесь на текст &#x1f913;</span>
+                </p>
+            </div>
+        </aside>
+    </div>
+
+    <button class="centering-button main__up-button main__up-button--hidden main__up-button--rounded">
+        <img src="resources/images/up-arrow.png" class="centering-button__rounded-image" alt="кружок со стрелкой вверх">
+    </button>
+</main>
+
+<footer class="page-footer page-footer--page-wide">
+    <div class="page-footer__inner">
+        <div class="page-footer__inner-content vertical-container">
+            <div class="vertical-container__main-item">
+                <a class="vertical-container__main-item-link" href=".">Главная</a>
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
