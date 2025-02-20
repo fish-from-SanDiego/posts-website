@@ -12,9 +12,9 @@ export default <Header>{
   },
   logoPath: 'resources/images/logo.png',
   headerLinks: [
-    { url: './factorio_article', text: 'Статьи' },
+    { url: './factorio-article', text: 'Статьи' },
     { url: './table.html', text: 'Таблица' },
-    { url: './loan_calc.html', text: 'Расчёт платежей' },
+    { url: './loan-calc', text: 'Расчёт платежей' },
     { url: './some_post.html', text: 'Какой-то пост' },
     { url: '', text: 'Что-то' },
   ],

@@ -29,7 +29,7 @@ export class AppController {
     );
   }
 
-  @Get('factorio_article')
+  @Get('factorio-article')
   @Render('factorio_article')
   getArticlePage() {
     const headInfo: Head = {
@@ -50,6 +50,26 @@ export class AppController {
           'resources/js/fancybox_local_ru.js',
           'resources/js/article_galleries.js',
         ],
+      },
+      defaultHeader,
+      defaultFooter,
+      headInfo,
+    );
+  }
+
+  @Get('loan-calc')
+  @Render('loan_calc')
+  getLoanCalcPage() {
+    const headInfo: Head = {
+      title: 'Расчёт платежей кредита',
+      description: 'Расчёт платежей кредита',
+      keywords: 'Расчёт, кредит, платежи, калькулятор',
+      specificScripts: ['resources/js/loan_calc.js'],
+      specificStylesheets: ['resources/styles/loan_calc.css'],
+    };
+    return Object.assign(
+      {
+        layout: 'main',
       },
       defaultHeader,
       defaultFooter,
