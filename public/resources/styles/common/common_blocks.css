@@ -1,0 +1,68 @@
+﻿.article-header {
+    font-weight: 700;
+}
+
+.article-section {
+    font-size: 2rem;
+}
+
+.section-header {
+    font-weight: 550;
+}
+
+.unordered-list {
+    list-style-type: disc;
+    list-style-position: outside;
+}
+
+.about {
+    background-color: white;
+    box-shadow: 0 0 2px gray;
+}
+
+.table {
+    background-color: white;
+    display: grid;
+}
+
+.table-row {
+    display: contents;
+}
+
+.image-collection {
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+}
+
+.article {
+    background-color: white;
+    box-shadow: 0 0 2px gray;
+}
+
+.post {
+    background-color: white;
+    box-shadow: 0 0 2px gray;
+    padding: 10px 20px;
+}
+
+.comments {
+    background-color: white;
+    box-shadow: 0 0 2px gray;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}

@@ -1,0 +1,15 @@
+<header class="{{headerClasses.header}}">
+  <div class="{{headerClasses.inner}}">
+    <div class="{{headerClasses.innerContent}}">
+      <a href="." class="{{headerClasses.headerLogo}}">
+        <img src="{{logoPath}}" alt="IS" class="{{headerClasses.logoImage}}">
+      </a>
+      <nav class="{{headerClasses.menu}}">
+        {{#each headerLinks}}
+          <a href="{{this.url}}" class="{{../headerClasses.menuLink}}">{{this.text}}</a>
+        {{/each}}
+      </nav>
+    </div>
+  </div>
+
+</header>

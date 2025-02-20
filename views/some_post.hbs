@@ -1,0 +1,33 @@
+<div class="main__content base-layout">
+  <div class="main__center-flow vertical-container">
+    <div class="post vertical-container__item">
+      <h1 class="post__title">Какой-то важный пост о чём-то</h1>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+      <p class="post__text">Очень важный параграф</p>
+    </div>
+    <spinning-loader loader-speed="0.65"
+                     class="vertical-container__item vertical-container__item--loader"
+                     id="post-comments-loader"></spinning-loader>
+    <div class="comments vertical-container__item vertical-container__item--hidden" id="post-comments">
+    </div>
+    <div class="warning vertical-container__item vertical-container__item--hidden" id="post-comments-warning">
+      <img src="resources/images/exclamation_mark.png" alt="Восклицательный знак в треугольнике"
+           class="warning__image">
+      <span class="warning__text">Что-то пошло не так &mdash; комментарии не загрузились</span>
+    </div>
+  </div>
+  {{>content/side_flow}}
+</div>

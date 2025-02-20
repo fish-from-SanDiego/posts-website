@@ -1,0 +1,10 @@
+﻿.page-body {
+    display: flex;
+}
+
+.page-body--standard {
+    min-height: 100vh;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+}
