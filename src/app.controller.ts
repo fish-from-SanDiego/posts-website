@@ -16,6 +16,7 @@ export class AppController {
       description: 'Главная сайта',
       keywords: 'Сайт',
       specificScripts: [],
+      specificModuleScripts: [],
       specificStylesheets: ['resources/styles/index.css'],
     };
     return Object.assign(
@@ -37,6 +38,7 @@ export class AppController {
       description: 'Гайд по ядерному реактору в Factorio',
       keywords: 'Factorio,гайд,ядерный реактор,видеоигры',
       specificScripts: ['resources/js/page-load-time.js'],
+      specificModuleScripts: [],
       specificStylesheets: [
         'resources/styles/factorio_article.css',
         'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css',
@@ -65,7 +67,53 @@ export class AppController {
       description: 'Расчёт платежей кредита',
       keywords: 'Расчёт, кредит, платежи, калькулятор',
       specificScripts: ['resources/js/loan_calc.js'],
+      specificModuleScripts: [],
       specificStylesheets: ['resources/styles/loan_calc.css'],
+    };
+    return Object.assign(
+      {
+        layout: 'main',
+      },
+      defaultHeader,
+      defaultFooter,
+      headInfo,
+    );
+  }
+
+  @Get('table')
+  @Render('table')
+  getTablePage() {
+    const headInfo: Head = {
+      title: 'Таблица - бизнес-план',
+      description: 'Таблица',
+      keywords: 'Сайт',
+      specificScripts: [],
+      specificModuleScripts: [],
+      specificStylesheets: ['resources/styles/table.css'],
+    };
+    return Object.assign(
+      {
+        layout: 'main',
+      },
+      defaultHeader,
+      defaultFooter,
+      headInfo,
+    );
+  }
+
+  @Get('some-post')
+  @Render('some_post')
+  getSomePostPage() {
+    const headInfo: Head = {
+      title: 'Пост',
+      description: 'Пост',
+      keywords: 'Пост',
+      specificScripts: [],
+      specificModuleScripts: [
+        'resources/js/components/spinning_loader.js',
+        'resources/js/comments.js',
+      ],
+      specificStylesheets: ['resources/styles/some_post.css'],
     };
     return Object.assign(
       {

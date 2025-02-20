@@ -3,5 +3,6 @@ export interface Head {
   keywords: string;
   description: string;
   specificScripts: Array<string>;
+  specificModuleScripts: Array<string>;
   specificStylesheets: Array<string>;
 }
