@@ -10,7 +10,7 @@ export class AppController {
 
   @Get()
   @Render('index')
-  getMainPage() {
+  getMainPage(): any {
     const headInfo: Head = {
       title: 'Главная',
       description: 'Главная сайта',
