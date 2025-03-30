@@ -9,6 +9,8 @@ export default <Header>{
     logoImage: 'page-header__logo-image',
     menu: 'page-header__menu',
     menuLink: 'page-header__menu-link',
+    profileLink: 'page-header__menu-profile',
+    loginButton: 'page-header__menu-login-button',
   },
   logoPath: 'resources/images/logo.png',
   headerLinks: [
@@ -17,4 +19,7 @@ export default <Header>{
     { url: './loan-calc', text: 'Расчёт платежей' },
     { url: './some-post', text: 'Какой-то пост' },
   ],
+  userLoggedIn: true,
+  loggedUser: { profileLink: '.', username: 'Username' },
+  loginLink: '.',
 };
