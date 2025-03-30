@@ -21,7 +21,7 @@ export class AppController {
     };
     return Object.assign(
       { layout: 'main' },
-      defaultHeader,
+      { ...defaultHeader, userLoggedIn: false },
       defaultFooter,
       headInfo,
       {

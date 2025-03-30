@@ -8,6 +8,11 @@
         {{#each headerLinks}}
           <a href="{{this.url}}" class="{{../headerClasses.menuLink}}">{{this.text}}</a>
         {{/each}}
+        {{#if userLoggedIn}}
+          <a href="{{loggedUser.profileLink}}" class="{{headerClasses.profileLink}}">{{loggedUser.username}}</a>
+        {{else}}
+          <a href="{{loginLink}}" class="{{headerClasses.loginButton}}">Войти</a>
+        {{/if}}
       </nav>
     </div>
   </div>
