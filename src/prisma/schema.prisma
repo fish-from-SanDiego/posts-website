@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  author    User     @relation(fields: [authorId], references: [id])
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories CategoriesOnPosts[]
+  likes      Like[]
+  comments   Comment[]
+
+  authorId Int
+}
+
+model User {
+  id            Int          @id @default(autoincrement())
+  username      String       @unique
+  pictureUrl    String?
+  // profile           UserProfile @relation(fields: [userProfileUserId], references: [userId])
+  posts         Post[]
+  likes         Like[]
+  comments      Comment[]
+  profile       UserProfile?
+  userProfileId Int
+}
+
+model UserProfile {
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  status String?
+  user   User    @relation(fields: [userId], references: [id])
+  userId Int     @unique
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
+  userId Int
+  postId Int
+
+  // index is created automatically
+  @@unique([userId, postId])
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  posts CategoriesOnPosts[]
+}
+
+model CategoriesOnPosts {
+  post     Post     @relation(fields: [postId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  postId     Int
+  categoryId Int
+
+  @@id([postId, categoryId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  postId    Int
+  authorId  Int
+
+  post   Post @relation(fields: [postId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+}

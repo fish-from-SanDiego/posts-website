@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  db-local:
+    image: 'postgres:17.4'
+    ports:
+      - "15432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=defaultdb
+
+
+volumes:
+  db-data:
