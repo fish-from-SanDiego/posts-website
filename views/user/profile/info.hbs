@@ -1,0 +1,51 @@
+<div class="main__content base-layout base-layout--from-left">
+  <div class="profile-block">
+    <div class="top-row">
+      {{#if profileImageUrl}}
+        <img src="{{profileImageUrl}}" alt="Фото профиля" class="profile-photo" />
+      {{else}}
+        <div class="profile-photo placeholder">
+          {{initials}}
+        </div>
+      {{/if}}
+
+      <a href="/profile/edit" class="edit-button">Редактировать профиль</a>
+    </div>
+
+    <h2 class="username">{{username}}</h2>
+
+    {{#if status}}
+      <p class="status">{{status}}</p>
+    {{else}}
+      <p class="status placeholder-text">Нет статуса</p>
+    {{/if}}
+
+    {{#if bio}}
+      <p class="bio">{{bio}}</p>
+    {{else}}
+      <p class="bio placeholder-text">Описание отсутствует</p>
+    {{/if}}
+
+    <div class="posts-section">
+      <h3>Посты</h3>
+      <ul class="posts-list">
+        {{#each posts}}
+          <li class="post-item">
+            <h4>{{title}}</h4>
+            <p>{{excerpt}}</p>
+            <a href="/posts/{{id}}" class="read-more">Читать далее</a>
+          </li>
+        {{/each}}
+      </ul>
+
+      <div class="pagination">
+        {{#if hasPrev}}
+          <a href="?page={{prevPage}}" class="page-link">← Назад</a>
+        {{/if}}
+        {{#if hasNext}}
+          <a href="?page={{nextPage}}" class="page-link">Вперёд →</a>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>

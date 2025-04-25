@@ -5,4 +5,5 @@ export interface Head {
   specificScripts: Array<string>;
   specificModuleScripts: Array<string>;
   specificStylesheets: Array<string>;
+  currentPageSection?: string;
 }
