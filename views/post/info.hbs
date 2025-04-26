@@ -1,0 +1,244 @@
+<div class="main__content base-layout">
+  <div class="vertical-container">
+    <div class="post vertical-container__item post__container">
+      <div class="post__header post__flex-row">
+        <div class="post__author post__flex-row">
+          {{#if author}}
+            {{#if author.pictureUrl}}
+              <img src="{{author.pictureUrl}}" alt="Аватар пользователя {{author.username}}" class="post__avatar">
+            {{else}}
+              <div class="post__avatar post__avatar--placeholder"></div>
+            {{/if}}
+            <a href="/users/{{author.id}}" class="post__username post__username--link">{{author.username}}</a>
+          {{else}}
+            <div class="post__avatar post__avatar--placeholder"></div>
+            <span class="post__username post__username--deleted">[удалён]</span>
+          {{/if}}
+        </div>
+        <div class="post__dates post__flex-col">
+          <span class="post__date">Пост создан: {{post.createdAt}}</span>
+          {{#if post.updatedAt}}
+            <span class="post__date post__date--updated">Пост изменен: {{post.updatedAt}}</span>
+          {{/if}}
+        </div>
+      </div>
+      <h1 class="post__title">{{post.title}}</h1>
+      <div class="post__categories post__flex-row">
+        {{#each post.categories}}
+          <span class="post__category">{{this.name}}</span>
+        {{/each}}
+      </div>
+      <div class="post__content">
+        <p class="post__text">{{post.content}}</p>
+      </div>
+    </div>
+    <!--    <spinning-loader loader-speed="0.65"-->
+    <!--                     class="vertical-container__item vertical-container__item--loader"-->
+    <!--                     id="post-comments-loader"></spinning-loader>-->
+
+    <spinning-loader loader-speed="0.65"
+                     class="vertical-container__item vertical-container__item--loader"
+                     id="post-comments-loader"></spinning-loader>
+
+    {{#if loggedId}}
+      <form id="comments-form" class="comments-form hidden">
+        <textarea id="comment-content" class="comment-textarea" placeholder="Комментарий..."></textarea>
+        <button id="submit-comment" class="button">Отправить</button>
+      </form>
+    {{/if}}
+    <div id="comments-list" class="comments hidden"></div>
+
+    <button id="load-more-comments" class="hidden">Показать ещё</button>
+
+    <div class="warning vertical-container__item hidden" id="comments-warning">
+      <img src="/resources/images/exclamation_mark.png" alt="Восклицательный знак в треугольнике"
+           class="warning__image">
+      <span class="warning__text">Что-то пошло не так &mdash; комментарии не загрузились</span>
+    </div>
+    <script>
+      const postId = Number('{{post.id}}');
+      const loggedId = Number('{{loggedId}}');
+      const commentMap = new Map();
+      const commentStack = [];
+      let latestId = null;
+
+
+      const loader = document.getElementById('comments-loader');
+      const container = document.getElementById('comments-list');
+      const warning = document.getElementById('post-comments-warning');
+      const moreBtn = document.getElementById('load-more-comments');
+
+      function createCommentElement(comment) {
+        const commentElement = document.createElement('div');
+        commentElement.classList.add('comments__column');
+        const hrElement = document.createElement('hr');
+        hrElement.classList.add('comments__hr');
+
+        const profilePic = document.createElement('div');
+        profilePic.classList.add('comment__avatar');
+        profilePic.style.backgroundImage = comment.author?.pictureUrl ? `url(${comment.author.pictureUrl})` : '';
+        if (!comment.author?.pictureUrl) profilePic.style.backgroundColor = 'darkgray';
+        profilePic.style.width = '50px';
+        profilePic.style.height = '50px';
+        profilePic.style.borderRadius = '50%';
+
+        const username = document.createElement('a');
+        username.classList.add('comments_comment-author');
+        if (comment.author) {
+          username.href = `/users/${comment.author.id}`;
+          username.textContent = comment.author.username;
+        } else {
+          username.textContent = '[удалён]';
+          username.style.color = 'gray';
+        }
+
+        const text = document.createElement('p');
+        text.classList.add('comments_comment-body');
+        text.textContent = comment.content;
+
+        const userInfo = document.createElement('div');
+        userInfo.classList.add('comments__row');
+        userInfo.appendChild(profilePic);
+        userInfo.appendChild(username);
+
+        commentElement.appendChild(userInfo);
+        commentElement.appendChild(text);
+
+
+        if (comment.author?.id === loggedId) {
+          const delBtn = document.createElement('button');
+          delBtn.textContent = 'Удалить';
+          delBtn.classList.add('comments__delete_button');
+          delBtn.onclick = async () => {
+            await fetch(`/comments/${comment.id}`, { method: 'DELETE' });
+          };
+          commentElement.appendChild(delBtn);
+        }
+        commentElement.appendChild(hrElement);
+
+        return commentElement;
+      }
+
+      function addComments(comments) {
+        for (const c of comments) {
+          if (!commentMap.has(c.id)) {
+            const el = createCommentElement(c);
+            container.appendChild(el);
+            commentMap.set(c.id, el);
+            commentStack.push(c.id);
+            if (!latestId || c.id > latestId) latestId = c.id;
+          }
+        }
+      }
+
+      async function fetchInitialComments() {
+        const res = await fetch(`/posts/${postId}/comments`);
+        const json = await res.json();
+        console.log(json.cursorValid);
+        console.log(postId);
+        if (json.cursorValid) {
+          if (json.data.length === 0) {
+            moreBtn.classList.add('hidden');
+          }
+          addComments(json.data);
+          document.getElementById('post-comments-loader').classList.add('hidden');
+          document.getElementById('comments-form').classList.remove('hidden');
+          document.getElementById('comments-list').classList.remove('hidden');
+          document.getElementById('load-more-comments').classList.remove('hidden');
+        } else {
+          document.getElementById('post-comments-loader').classList.add('hidden');
+          document.getElementById('comments-warning').classList.remove('hidden');
+          document.getElementById('load-more-comments').classList.add('hidden');
+        }
+      }
+
+      async function fetchMoreComments() {
+        try {
+          while (commentStack.length > 0) {
+            const id = commentStack[commentStack.length - 1];
+            const res = await fetch(`/posts/${postId}/comments?cursorId=${id}`);
+            const json = await res.json();
+            console.log(json.data);
+            if (!json.cursorValid) {
+              commentStack.pop();
+              continue;
+            }
+            if (json.data.length === 0) {
+              moreBtn.classList.add('hidden');
+            }
+            addComments(json.data);
+            break;
+          }
+        } catch (e) {
+          document.getElementById('comments-warning').classList.remove('hidden');
+          document.getElementById('load-more-comments').classList.add('hidden');
+        }
+        // if (commentStack.length === 0) moreBtn.style.display = 'none';
+      }
+
+      function setupSSE() {
+        const newEvt = new EventSource(`/posts/${postId}/comments/sse/new`);
+        newEvt.onmessage = ({ event, data }) => {
+          const eData = JSON.parse(data);
+          const c = eData.comment;
+          if (!commentMap.has(c.id) && (!latestId || c.id > latestId)) {
+            const el = createCommentElement(c);
+            container.insertBefore(el, container.firstChild);
+            commentMap.set(c.id, el);
+            if (!latestId || c.id > latestId) latestId = c.id;
+          }
+        };
+
+        const delEvt = new EventSource(`/posts/${postId}/comments/sse/deleted`);
+        delEvt.onmessage = ({ event, data }) => {
+          const eData = JSON.parse(data);
+          const el = commentMap.get(eData.commentId);
+          if (el) el.remove();
+          commentMap.delete(data.commentId);
+        };
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        fetchInitialComments();
+        setupSSE();
+        moreBtn.onclick = fetchMoreComments;
+      });
+
+
+      document.getElementById('comments-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const authorId = Number('{{loggedId}}');
+        const content = document.getElementById('comment-content').value;
+        const postId = Number('{{post.id}}');
+
+        const data = {
+          content: content,
+          authorId: authorId,
+          postId: postId,
+        };
+
+        try {
+          const response = await fetch(`/comments`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            document.getElementById('comments-form').reset();
+          } else {
+            console.log('Something went wrong');
+          }
+        } catch (error) {
+          console.log('Error:', error);
+          console.log('Error occurred');
+        }
+        
+      });
+
+    </script>
+  </div>
+</div>

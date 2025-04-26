@@ -1,16 +1,19 @@
 <head>
-  <script src="resources/js/up-button.js"></script>
-  <script src="resources/js/menu-link-current.js"></script>
-  <link rel="preload" href="resources/fonts/OpenSans-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
+  <script>
+    const currentPageSection = '{{currentPageSection}}'
+  </script>
+  <script src="/resources/js/up-button.js"></script>
+  <script src="/resources/js/menu-link-current.js"></script>
+  <link rel="preload" href="/resources/fonts/OpenSans-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
         crossorigin="anonymous" />
-  <link rel="preload" href="resources/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
+  <link rel="preload" href="/resources/fonts/OpenSans-Italic-VariableFont_wdth,wght.ttf" as="font" type="font/ttf"
         crossorigin="anonymous" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
   <title>{{title}}</title>
   <meta name="keywords" content="{{keywords}}">
   <meta name="description" content="{{description}}">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
   {{#each specificScripts}}
     <script src="{{this}}"></script>
   {{/each}}

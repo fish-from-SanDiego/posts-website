@@ -17,7 +17,8 @@ export class AppController {
       keywords: 'Сайт',
       specificScripts: [],
       specificModuleScripts: [],
-      specificStylesheets: ['resources/styles/index.css'],
+      specificStylesheets: ['/resources/styles/index.css'],
+      currentPageSection: '',
     };
     return Object.assign(
       { layout: 'main' },
@@ -37,20 +38,21 @@ export class AppController {
       title: 'Эффективный ядерный реактор в Factorio',
       description: 'Гайд по ядерному реактору в Factorio',
       keywords: 'Factorio,гайд,ядерный реактор,видеоигры',
-      specificScripts: ['resources/js/page-load-time.js'],
+      specificScripts: ['/resources/js/page-load-time.js'],
       specificModuleScripts: [],
       specificStylesheets: [
         'resources/styles/factorio_article.css',
         'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css',
       ],
+      currentPageSection: 'Factorio',
     };
     return Object.assign(
       {
         layout: 'main',
         bodySectionScripts: [
           'https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js',
-          'resources/js/fancybox_local_ru.js',
-          'resources/js/article_galleries.js',
+          '/resources/js/fancybox_local_ru.js',
+          '/resources/js/article_galleries.js',
         ],
       },
       defaultHeader,
@@ -69,6 +71,7 @@ export class AppController {
       specificScripts: ['resources/js/loan_calc.js'],
       specificModuleScripts: [],
       specificStylesheets: ['resources/styles/loan_calc.css'],
+      currentPageSection: 'Расчёт платежей',
     };
     return Object.assign(
       {
@@ -90,6 +93,7 @@ export class AppController {
       specificScripts: [],
       specificModuleScripts: [],
       specificStylesheets: ['resources/styles/table.css'],
+      currentPageSection: 'Таблица',
     };
     return Object.assign(
       {
@@ -114,6 +118,7 @@ export class AppController {
         'resources/js/comments.js',
       ],
       specificStylesheets: ['resources/styles/some_post.css'],
+      currentPageSection: 'Пост (static)',
     };
     return Object.assign(
       {

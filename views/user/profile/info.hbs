@@ -1,0 +1,33 @@
+<div class="main__content base-layout base-layout--from-left">
+  <div class="profile-block">
+    <div class="top-row">
+      {{#if profileImageUrl}}
+        <img src="{{profileImageUrl}}" alt="Фото профиля" class="profile-photo" />
+      {{else}}
+        <div class="profile-photo placeholder">
+        </div>
+      {{/if}}
+      <div class="top-row__column">
+        <h2 class="username">{{username}}</h2>
+
+        {{#if status}}
+          <p class="status">{{status}}</p>
+        {{else}}
+          <p class="status placeholder-text">Нет статуса</p>
+        {{/if}}
+
+        {{#if bio}}
+          <p class="bio">{{bio}}</p>
+        {{else}}
+          <p class="bio placeholder-text">Описание отсутствует</p>
+        {{/if}}
+      </div>
+    </div>
+
+    {{#if loggedId}}
+      <a href="/users/{{loggedId}}/edit" class="edit-button">Редактировать профиль</a>
+    {{/if}}
+
+
+  </div>
+</div>

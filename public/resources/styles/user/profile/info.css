@@ -1,0 +1,119 @@
+@import "../../reset.css";
+@import "../../common/body.css";
+@import "../../common/header.css";
+@import "../../common/common_blocks.css";
+@import "../../common/footer.css";
+@import "../../common/views_default.css";
+@import "../../common/main.css";
+@import "../../fonts/open_sans.css";
+
+
+.profile-block {
+    font-family: "Open Sans", sans-serif;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 2.22rem; /* 20px */
+}
+
+.top-row {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.top-row__column{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    gap: 2px;
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.profile-photo.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: darkgray;
+    width: 120px;
+    height: 120px;
+}
+
+.edit-button {
+    margin-left: 5px;
+    padding: 0.55rem 1.11rem; /* 5px 10px */
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 0.44rem; /* 4px */
+    text-decoration: none;
+    width: fit-content;
+    font-size: 2rem; /* 9px */
+}
+
+.username {
+    font-size: 3rem; /* 15px */
+    margin: 0.66rem 0 0.44rem 0; /* 6px 0 4px */
+    color: #2B2B2B;
+}
+
+.status,
+.bio {
+    margin: 0.28rem 0; /* 2.5px */
+    font-size: 2rem; /* 9px */
+    color: #444;
+}
+
+.posts-header{
+    font-size: 3rem;
+}
+
+.posts-section {
+    margin-top: 30px; /* 20px */
+}
+
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.11rem; /* 10px */
+    padding: 0;
+    list-style: none;
+}
+
+.post-item {
+    padding: 1.11rem; /* 10px */
+    background: #fff;
+    border: 0.11rem solid #ccc; /* 1px */
+    border-radius: 0.55rem; /* 5px */
+}
+
+.read-more {
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.pagination {
+    margin-top: 1.66rem; /* 15px */
+    display: flex;
+    justify-content: space-between;
+}
+
+.page-link {
+    font-size: 1rem;
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+
+

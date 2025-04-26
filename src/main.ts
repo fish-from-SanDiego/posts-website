@@ -5,6 +5,9 @@ import * as hbs from 'express-handlebars';
 import { join } from 'path';
 import { ConfigNamespaces } from './config/config.namespaces';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { MethodOverrideMiddleware } from './app.middlewares';
+import * as bodyParser from 'body-parser';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -22,7 +25,10 @@ async function bootstrap() {
     }),
   );
   app.setViewEngine('hbs');
-
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+  app.use(new MethodOverrideMiddleware().use);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(configService.getOrThrow('app.port', { infer: true }));
 }
 

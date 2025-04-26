@@ -1,0 +1,35 @@
+<div class="main__content base-layout">
+  <h1 class="posts__header">Посты</h1>
+
+  <ul class="posts__list">
+    {{#each posts}}
+      <li class="posts__item">
+        <a href="/posts/{{this.id}}" class="posts__link">
+          <p class="posts__title">{{this.title}}</p>
+          {{#if this.author}}
+            <span class="posts__author">Автор: {{this.author.username}}</span>
+          {{else}}
+            <span class="posts__author">Автор удалён</span>
+          {{/if}}
+          
+        </a>
+      </li>
+    {{/each}}
+  </ul>
+
+  <div class="pagination">
+    {{#if prevPage}}
+      <a href="/posts?page={{prevPage}}" class="pagination__arrow pagination__arrow--left">←</a>
+    {{else}}
+      <span class="pagination__arrow pagination__arrow--left pagination__arrow--disabled">←</span>
+    {{/if}}
+
+    <span class="pagination__page">Страница {{pageNumber}}</span>
+
+    {{#if nextPage}}
+      <a href="/posts?page={{nextPage}}" class="pagination__arrow pagination__arrow--right">→</a>
+    {{else}}
+      <span class="pagination__arrow pagination__arrow--right pagination__arrow--disabled">→</span>
+    {{/if}}
+  </div>
+</div>

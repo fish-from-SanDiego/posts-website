@@ -1,0 +1,26 @@
+<div class="main__content base-layout base-layout--from-left">
+  <div style="display: flex; flex-direction: column; justify-content: start">
+
+    <h1 class="page-title" style="text-align: left"> {{username}}</h1>
+    <form id="editForm" action="/users/{{userId}}" method="POST">
+      <input type="hidden" name="_method" value="PATCH">
+      <div class="form-group">
+        <label for="bio" class="form-label">Описание</label>
+        <textarea id="bio" name="bio" rows="4" placeholder="Введите описание...">{{bio}}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="status" class="form-label">Статус</label>
+        <input type="text" id="status" name="status" value="{{status}}" placeholder="Введите статус">
+      </div>
+
+      <!--    <div class="form-group">-->
+      <!--      <label for="photo" class="form-label">Фото</label>-->
+      <!--      <input type="file" id="photo" name="photo" accept="image/*">-->
+      <!--    </div>-->
+
+      <button type="submit" class="submit-button">Сохранить</button>
+    </form>
+  </div>
+
+</div>

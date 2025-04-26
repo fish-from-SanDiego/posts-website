@@ -14,37 +14,36 @@ datasource db {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  author    User     @relation(fields: [authorId], references: [id])
-  title     String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int       @id @default(autoincrement())
+  author     User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  title      String
+  content    String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  likesCount Int       @default(0)
 
   categories CategoriesOnPosts[]
   likes      Like[]
   comments   Comment[]
 
-  authorId Int
+  authorId Int?
 }
 
 model User {
-  id            Int          @id @default(autoincrement())
-  username      String       @unique
-  pictureUrl    String?
-  // profile           UserProfile @relation(fields: [userProfileUserId], references: [userId])
-  posts         Post[]
-  likes         Like[]
-  comments      Comment[]
-  profile       UserProfile?
-  userProfileId Int
+  id         Int          @id @default(autoincrement())
+  username   String       @unique
+  pictureUrl String?
+  posts      Post[]
+  likes      Like[]
+  comments   Comment[]
+  profile    UserProfile?
 }
 
 model UserProfile {
   id     Int     @id @default(autoincrement())
   bio    String?
   status String?
-  user   User    @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int     @unique
 }
 
@@ -52,8 +51,8 @@ model Like {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
-  post Post @relation(fields: [postId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   userId Int
   postId Int
@@ -70,8 +69,8 @@ model Category {
 }
 
 model CategoriesOnPosts {
-  post     Post     @relation(fields: [postId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   postId     Int
   categoryId Int
@@ -84,8 +83,8 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
   postId    Int
-  authorId  Int
+  authorId  Int?
 
-  post   Post @relation(fields: [postId], references: [id])
-  author User @relation(fields: [authorId], references: [id])
+  post   Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
 }
