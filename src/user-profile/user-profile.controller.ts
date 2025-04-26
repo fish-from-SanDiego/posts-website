@@ -4,12 +4,19 @@ import {
   Param,
   Render,
   NotFoundException,
+  Query,
+  Patch,
+  Body,
+  Res,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { Head } from '../templateModels/head.interface';
 import defaultHeader from '../templateModels/header.default';
 import defaultFooter from '../templateModels/footer.default';
 import { Prisma } from '@prisma/client';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { Response } from 'express';
+import { notFound } from './exceptions';
 
 @Controller('users')
 export class UserProfileController {
@@ -22,7 +29,10 @@ export class UserProfileController {
   //
   @Get(':userId')
   @Render('user/profile/info')
-  async getUserProfile(@Param('userId') userId: string) {
+  async getUserProfile(
+    @Param('userId') userId: string,
+    @Query('loggedId') loggedId?: number,
+  ) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
@@ -33,8 +43,7 @@ export class UserProfileController {
       include,
     );
 
-    if (userProfile == null)
-      throw new NotFoundException("A user with that id doesn't exist");
+    if (userProfile == null) throw notFound();
     const user = userProfile.user;
     const headInfo: Head = {
       title: user.username,
@@ -50,25 +59,81 @@ export class UserProfileController {
     };
     return Object.assign(
       { layout: 'main' },
-      { ...defaultHeader, userLoggedIn: true },
+      { ...defaultHeader },
       defaultFooter,
       headInfo,
+      {
+        username: user.username,
+        profileImageUrl: user.pictureUrl,
+        status: userProfile.status,
+        bio: userProfile.bio,
+        loggedId: loggedId ? loggedId : undefined,
+      },
     );
   }
 
-  //
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.userProfileService.findOne(+id);
-  // }
-  //
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateUserProfileDto: UpdateUserProfileDto,
-  // ) {
-  //   return this.userProfileService.update(+id, updateUserProfileDto);
-  // }
+  @Get(':userId/edit')
+  @Render('user/profile/edit')
+  async editInfoPage(@Param('userId') userId: string) {
+    const include: Prisma.UserProfileInclude = {
+      user: true,
+    };
+    const userProfile = await this.userProfileService.profile(
+      {
+        userId: Number(userId),
+      },
+      include,
+    );
+    if (userProfile == null) throw notFound();
+
+    const user = userProfile.user;
+    const headInfo: Head = {
+      title: `${user.username} - изменение`,
+      description: ``,
+      keywords: '',
+      specificScripts: [],
+      specificModuleScripts: [],
+      specificStylesheets: [
+        `/resources/styles/user/profile/edit.css`,
+        `/resources/styles/common/views_default.css`,
+      ],
+      currentPageSection: 'Профиль',
+    };
+    return Object.assign(
+      { layout: 'main' },
+      { ...defaultHeader },
+      defaultFooter,
+      headInfo,
+      {
+        username: user.username,
+        status: userProfile.status,
+        bio: userProfile.bio,
+        userId: user.id,
+      },
+    );
+  }
+
+  @Patch(':userId')
+  async update(
+    @Param('userId') userId: string,
+    @Body() updateUserProfileDto: UpdateUserProfileDto,
+    @Res() res: Response,
+  ) {
+    const where: Prisma.UserProfileWhereUniqueInput = {
+      userId: Number(userId),
+    };
+    await this.userProfileService.updateProfile(
+      where,
+      {
+        bio: updateUserProfileDto.bio,
+        status: updateUserProfileDto.status,
+        // pictureUrl:updateUserProfileDto.pictureUrl,
+      },
+      {},
+    );
+    return res.redirect(`/users/${userId}`);
+  }
+
   //
   // @Delete(':id')
   // remove(@Param('id') id: string) {

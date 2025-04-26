@@ -6,7 +6,6 @@
                 const linkText = child.textContent;
                 if (!linkText) continue;
                 if (linkText === currentPageSection) {
-                    console.log(linkText);
                     child.classList.add('page-header__menu-link--current');
                 }
             }

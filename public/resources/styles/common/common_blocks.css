@@ -48,6 +48,8 @@
     background-color: white;
     box-shadow: 0 0 2px gray;
     padding: 10px 20px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .comments {
@@ -58,6 +60,8 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .vertical-container {
@@ -65,4 +69,22 @@
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
+    box-sizing: border-box;
+}
+
+a.vertical-container__main-item-link {
+    font-family: "Open Sans", sans-serif;
+    font-size: 2.4rem;
+    font-weight: 450;
+    padding: 10px 10px;
+    display: block;
+    text-decoration: none;
+    color: #EDE8F5;
+    text-align: center;
+    margin: auto;
+}
+
+a.vertical-container__main-item-link:hover {
+    text-decoration: none;
+    color: antiquewhite;
 }

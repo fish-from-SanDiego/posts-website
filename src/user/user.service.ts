@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
+import { conflict, notFound } from './exceptions';
 
 @Injectable()
 export class UserService {
@@ -12,25 +13,33 @@ export class UserService {
     data: CreateUserDto,
     include: Prisma.UserInclude,
   ): Promise<User> {
-    return this.prisma.user.create({
-      data: {
-        username: data.username,
-        profile: {
-          create: {},
+    try {
+      return this.prisma.user.create({
+        data: {
+          username: data.username,
+          profile: {
+            create: {},
+          },
         },
-      },
-      include: include,
-    });
+        include: include,
+      });
+    } catch (e) {
+      throw this.handleError(e);
+    }
   }
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
     include: Prisma.UserInclude,
   ) {
-    return this.prisma.user.findUnique({
-      where: userWhereUniqueInput,
-      include: include,
-    });
+    try {
+      return this.prisma.user.findUnique({
+        where: userWhereUniqueInput,
+        include: include,
+      });
+    } catch (e) {
+      throw this.handleError(e);
+    }
   }
 
   async users(params: {
@@ -42,13 +51,26 @@ export class UserService {
     include?: Prisma.UserInclude;
   }) {
     const { skip, take, cursor, where, orderBy, include } = params;
-    return this.prisma.user.findMany({
-      skip: skip,
-      take: take,
-      cursor: cursor,
-      where: where,
-      orderBy: orderBy,
-      include: include,
-    });
+    try {
+      return this.prisma.user.findMany({
+        skip: skip,
+        take: take,
+        cursor: cursor,
+        where: where,
+        orderBy: orderBy,
+        include: include,
+      });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  private handleError(e): any {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === 'P2001' || e.code === 'P2015' || e.code === 'P2025')
+        return notFound();
+      if (e.code === 'P2002') return conflict();
+    }
+    return e;
   }
 }

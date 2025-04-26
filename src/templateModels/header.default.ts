@@ -14,12 +14,13 @@ export default <Header>{
   },
   logoPath: '/resources/images/logo.png',
   headerLinks: [
+    { url: '/posts', text: 'Посты' },
     { url: '/factorio-article', text: 'Factorio' },
     { url: '/table', text: 'Таблица' },
     { url: '/loan-calc', text: 'Расчёт платежей' },
     { url: '/some-post', text: 'Пост (static)' },
   ],
-  userLoggedIn: true,
+  userLoggedIn: false,
   loggedUser: { profileLink: '.', username: 'Username' },
-  loginLink: '.',
+  loginLink: '/users/add',
 };

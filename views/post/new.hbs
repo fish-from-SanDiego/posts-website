@@ -1,0 +1,48 @@
+<div class="main__content">
+  <h1 class="form__title vertical-container__item">Создать пост</h1>
+  <form action="/posts" method="POST" class="form vertical-container__item">
+    <input type="hidden" name="authorId" value="{{authorId}}">
+    <div class="form__group">
+      <label for="title" class="form__label">Заголовок:</label>
+      <input type="text" id="title" name="title" required class="form__input" />
+    </div>
+
+    <div class="form__group">
+      <label for="content" class="form__label">Содержание:</label>
+      <textarea id="content" name="content" rows="5" required class="form__textarea"></textarea>
+    </div>
+
+    <div class="form__group">
+      <label class="form__label">Категории:</label>
+      <div id="category-container">
+        <div class="category-input">
+          <input type="text" name="categoryNames[]" class="form__input" placeholder="Введите категорию" required />
+          <button type="button" class="form__btn-remove" onclick="removeCategory(this)">−</button>
+        </div>
+      </div>
+      <button type="button" class="form__btn-add" onclick="addCategory()">+</button>
+    </div>
+
+    <div class="form__group">
+      <button type="submit" class="form__submit">Создать</button>
+    </div>
+  </form>
+
+  <script>
+    function addCategory() {
+      const container = document.getElementById('category-container');
+      const firstInput = container.querySelector('.category-input');
+      const newInput = firstInput.cloneNode(true);
+      newInput.querySelector('input').value = '';
+      container.appendChild(newInput);
+    }
+
+    function removeCategory(button) {
+      const container = document.getElementById('category-container');
+      const allInputs = container.querySelectorAll('.category-input');
+      if (allInputs.length > 1) {
+        button.parentElement.remove();
+      }
+    }
+  </script>
+</div>
