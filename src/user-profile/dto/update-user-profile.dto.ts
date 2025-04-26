@@ -22,7 +22,6 @@ export class UpdateUserProfileDto {
     required: false,
     type: 'string',
   })
-  @IsUrl()
   @IsOptional()
   @Type(() => String)
   @MinLength(1)
