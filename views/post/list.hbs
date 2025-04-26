@@ -4,8 +4,15 @@
   <ul class="posts__list">
     {{#each posts}}
       <li class="posts__item">
-        <a href="/posts/{{this.id}}" class="posts__title">{{this.title}}</a>
-        <span class="posts__author">Автор: {{this.author.username}}</span>
+        <a href="/posts/{{this.id}}" class="posts__link">
+          <p class="posts__title">{{this.title}}</p>
+          {{#if this.author}}
+            <span class="posts__author">Автор: {{this.author.username}}</span>
+          {{else}}
+            <span class="posts__author">Автор удалён</span>
+          {{/if}}
+          
+        </a>
       </li>
     {{/each}}
   </ul>
