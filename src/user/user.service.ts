@@ -18,7 +18,7 @@ export class UserService {
         data: {
           username: data.username,
           profile: {
-            create: {},
+            create: {} as Prisma.UserProfileCreateWithoutUserInput,
           },
         },
         include: include,
