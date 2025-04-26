@@ -1,7 +1,30 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConflictResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { CategoryPageQuery } from './query/category.page.query';
+import { Response } from 'express';
+import { CategoryDto } from './responseData/categoryDto';
+import { CategoryIdParam } from './query/category.id.param';
+import { notFound } from './exceptions';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @ApiTags('categories')
 @Controller('api/categories')
@@ -10,43 +33,56 @@ export class CategoryApiController {
 
   @Post()
   @ApiOperation({ summary: 'Создание категории' })
-  @ApiResponse({ status: 200, description: 'Category created successfully' })
-  create(@Body() createCategoryDto: CreateCategoryDto) {
+  @ApiResponse({
+    status: 201,
+    description: 'Успешное создание категории',
+    type: CategoryDto,
+  })
+  @ApiConflictResponse({
+    description: 'Категория с таким именем уже существует',
+  })
+  createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
   @Get()
   @ApiOperation({
-    summary: 'Get all categories with pagination and HATEOAS links',
+    summary: 'Получение категорий на определённой странице',
   })
-  @ApiResponse({ status: 200, description: 'List of categories' })
-  async findAll(
-    @Query('page') page = '1',
-    @Query('limit') limit = '10',
-    @Res() res: Response,
-  ) {
-    const pageNumber = Math.max(1, parseInt(page, 10));
-    const limitNumber = Math.min(100, Math.max(1, parseInt(limit, 10))); // ограничение лимита
+  @ApiOkResponse({
+    description: 'Успешное получение категорий',
+    type: CategoryDto,
+    isArray: true,
+    headers: {
+      Link: {
+        description: 'Header для пагинации',
+        schema: {
+          type: 'string',
+          example: '<https://host.com/api/categories/?page=2>; rel="next"',
+        },
+      },
+    },
+  })
+  async findAll(@Query() query: CategoryPageQuery, @Res() res: Response) {
+    const pageNumber = query.page;
 
-    const { categories, total } = await this.categoryService.findAll(
-      pageNumber,
-      limitNumber,
-    );
+    const { categories, total } =
+      await this.categoryService.categories(pageNumber);
 
-    const lastPage = Math.ceil(total / limitNumber);
+    const lastPage = Math.ceil(total / this.categoryService.pageSize);
 
-    const baseUrl = `${res.req.protocol}://${res.req.get('host')}${res.req.baseUrl}/categories`;
+    const baseUrl = `${res.req.protocol}://${res.req.get('host')}${res.req.baseUrl}/api/categories`;
 
-    const links = [];
+    const links: string[] = [];
 
     if (pageNumber > 1) {
       links.push(
-        `<${baseUrl}?page=${pageNumber - 1}&limit=${limitNumber}>; rel="prev"`,
+        `<${baseUrl}?page=${pageNumber - 1}&limit=${this.categoryService.pageSize}>; rel="prev"`,
       );
     }
     if (pageNumber < lastPage) {
       links.push(
-        `<${baseUrl}?page=${pageNumber + 1}&limit=${limitNumber}>; rel="next"`,
+        `<${baseUrl}?page=${pageNumber + 1}&limit=${this.categoryService.pageSize}>; rel="next"`,
       );
     }
 
@@ -54,38 +90,48 @@ export class CategoryApiController {
       res.setHeader('Link', links.join(', '));
     }
 
-    return res.json({
-      data: categories,
-      meta: {
-        total,
-        page: pageNumber,
-        limit: limitNumber,
-        lastPage,
-      },
-    });
+    return res.json(categories);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get category by id' })
-  @ApiResponse({ status: 200, description: 'Category details' })
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  @ApiOperation({ summary: 'Получить категорию по id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Объект категории с id',
+    type: CategoryDto,
+  })
+  @ApiNotFoundResponse({ description: 'Категория не найдена' })
+  async getOne(@Param() param: CategoryIdParam) {
+    const res = await this.categoryService.category(param.id);
+    if (res == null) throw notFound();
+    return res;
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update category by id' })
-  @ApiResponse({ status: 200, description: 'Category updated successfully' })
-  update(
-    @Param('id') id: string,
+  @ApiOperation({ summary: 'Обновление значение имени для категории' })
+  @ApiResponse({
+    status: 200,
+    description: 'Категория успешно обновлена',
+    type: CategoryDto,
+  })
+  @ApiConflictResponse({ description: 'Конфликт с существующим значением' })
+  @ApiNotFoundResponse({ description: 'По id не найдено категории' })
+  async update(
+    @Param() param: CategoryIdParam,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoryService.update(+id, updateCategoryDto);
+    return this.categoryService.update(param.id, updateCategoryDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete category by id' })
-  @ApiResponse({ status: 200, description: 'Category deleted successfully' })
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+  @ApiOperation({ summary: 'Удаление категории по id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Категория успешно удалена',
+    type: CategoryDto,
+  })
+  @ApiNotFoundResponse({ description: 'Категория с таким id не найдена' })
+  async remove(@Param() param: CategoryIdParam) {
+    return this.categoryService.remove(param.id);
   }
 }

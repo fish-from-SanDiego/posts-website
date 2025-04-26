@@ -8,6 +8,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { MethodOverrideMiddleware } from './app.middlewares';
 import * as bodyParser from 'body-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { GlobalFilter } from './exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -29,6 +31,16 @@ async function bootstrap() {
   app.use(bodyParser.json());
   app.use(new MethodOverrideMiddleware().use);
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  const config = new DocumentBuilder()
+    .setTitle('API сайта')
+    .setDescription(
+      'API позволяет манипулировать постами, пользователями, их профилями, комментариями, категориями',
+    )
+    .setVersion('1.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
+  app.useGlobalFilters(new GlobalFilter());
   await app.listen(configService.getOrThrow('app.port', { infer: true }));
 }
 

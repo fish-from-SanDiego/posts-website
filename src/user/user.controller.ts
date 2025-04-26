@@ -2,7 +2,9 @@ import { Controller, Post, Body, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Response } from 'express';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController(true)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}

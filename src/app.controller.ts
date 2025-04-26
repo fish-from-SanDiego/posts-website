@@ -3,7 +3,9 @@ import { AppService } from './app.service';
 import defaultHeader from './templateModels/header.default';
 import defaultFooter from './templateModels/footer.default';
 import { Head } from './templateModels/head.interface';
+import { ApiExcludeController, ApiExcludeEndpoint } from '@nestjs/swagger';
 
+@ApiExcludeController(true)
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
