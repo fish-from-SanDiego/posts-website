@@ -33,9 +33,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = new DocumentBuilder()
     .setTitle('API сайта')
-    .setDescription(
-      'API позволяет манипулировать постами, пользователями, их профилями, комментариями, категориями',
-    )
+    .setDescription('API')
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
