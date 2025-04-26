@@ -139,7 +139,7 @@ export class PostService {
 
   async createPost(data: CreatePostDto) {
     try {
-      return this.prisma.post.create({
+      return await this.prisma.post.create({
         data: {
           title: data.title,
           content: data.content,
@@ -176,7 +176,7 @@ export class PostService {
   }) {
     try {
       const { data, where } = params;
-      return this.prisma.post.update({
+      return await this.prisma.post.update({
         data: {
           title: data.title,
           content: data.content,
@@ -190,7 +190,7 @@ export class PostService {
 
   async deletePost(where: Prisma.PostWhereUniqueInput): Promise<Post> {
     try {
-      return this.prisma.post.delete({
+      return await this.prisma.post.delete({
         where,
       });
     } catch (e) {

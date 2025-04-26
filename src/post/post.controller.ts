@@ -62,8 +62,8 @@ export class PostController {
 
   @Get('new')
   @Render('post/new')
-  goToPostCreation(@Query('loggedId') loggedId: number) {
-    const authorId = Number(loggedId);
+  goToPostCreation(@Query('loggedId', ParseIntPipe) loggedId: number) {
+    const authorId = loggedId;
     const headInfo: Head = {
       title: 'Создание поста',
       description: `Создание поста`,
