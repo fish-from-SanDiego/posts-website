@@ -58,8 +58,5 @@ export class CreatePostDto {
   @IsString()
   @MinLength(2)
   @MaxLength(15)
-  @Matches(/^[^\s.,;:!?(){}[\]<>/\\|'"~@#$%^&*+=]*$/, {
-    message: 'Имя категории не должно содержать посторонних символов',
-  })
   categoryNames: string[];
 }

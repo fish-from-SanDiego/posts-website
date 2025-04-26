@@ -19,8 +19,5 @@ export class CreateCategoryDto {
   @IsString()
   @MinLength(2)
   @MaxLength(15)
-  @Matches(/^[^\s.,;:!?(){}[\]<>/\\|'"~@#$%^&*+=]*$/, {
-    message: 'Имя категории не должно содержать посторонних символов',
-  })
   name: string;
 }
