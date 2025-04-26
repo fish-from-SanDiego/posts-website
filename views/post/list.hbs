@@ -1,26 +1,26 @@
 <div class="main__content base-layout">
-  <h1 class="posts__header">Коллекция постов</h1>
+  <h1 class="posts__header">Посты</h1>
 
   <ul class="posts__list">
     {{#each posts}}
       <li class="posts__item">
         <a href="/posts/{{this.id}}" class="posts__title">{{this.title}}</a>
-        <span class="posts__author">Автор: {{this.author.name}}</span>
+        <span class="posts__author">Автор: {{this.author.username}}</span>
       </li>
     {{/each}}
   </ul>
 
   <div class="pagination">
-    {{#if (gt currentPage 1)}}
-      <a href="?page={{decrement currentPage}}" class="pagination__arrow pagination__arrow--left">←</a>
+    {{#if prevPage}}
+      <a href="/posts?page={{prevPage}}" class="pagination__arrow pagination__arrow--left">←</a>
     {{else}}
       <span class="pagination__arrow pagination__arrow--left pagination__arrow--disabled">←</span>
     {{/if}}
 
-    <span class="pagination__page">Страница {{currentPage}} из {{pageCount}}</span>
+    <span class="pagination__page">Страница {{pageNumber}}</span>
 
-    {{#if (lt currentPage pageCount)}}
-      <a href="?page={{increment currentPage}}" class="pagination__arrow pagination__arrow--right">→</a>
+    {{#if nextPage}}
+      <a href="/posts?page={{nextPage}}" class="pagination__arrow pagination__arrow--right">→</a>
     {{else}}
       <span class="pagination__arrow pagination__arrow--right pagination__arrow--disabled">→</span>
     {{/if}}

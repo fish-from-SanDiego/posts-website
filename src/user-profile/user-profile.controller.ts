@@ -8,6 +8,7 @@ import {
   Patch,
   Body,
   Res,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { Head } from '../templateModels/head.interface';
@@ -30,15 +31,15 @@ export class UserProfileController {
   @Get(':userId')
   @Render('user/profile/info')
   async getUserProfile(
-    @Param('userId') userId: string,
-    @Query('loggedId') loggedId?: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('loggedId', new ParseIntPipe({ optional: true })) loggedId?: number,
   ) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
     const userProfile = await this.userProfileService.profile(
       {
-        userId: parseInt(userId),
+        userId: userId,
       },
       include,
     );
@@ -74,13 +75,13 @@ export class UserProfileController {
 
   @Get(':userId/edit')
   @Render('user/profile/edit')
-  async editInfoPage(@Param('userId') userId: string) {
+  async editInfoPage(@Param('userId', ParseIntPipe) userId: number) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
     const userProfile = await this.userProfileService.profile(
       {
-        userId: Number(userId),
+        userId: userId,
       },
       include,
     );
@@ -115,7 +116,7 @@ export class UserProfileController {
 
   @Patch(':userId')
   async update(
-    @Param('userId') userId: string,
+    @Param('userId', ParseIntPipe) userId: number,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
     @Res() res: Response,
   ) {

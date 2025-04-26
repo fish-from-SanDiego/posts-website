@@ -10,6 +10,7 @@ import {
   Render,
   Query,
   Res,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Prisma } from '@prisma/client';
@@ -19,14 +20,44 @@ import defaultFooter from '../templateModels/footer.default';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Response } from 'express';
 import { notFound } from './exceptions';
+import { Min } from 'class-validator';
+import { ListPostsQueryDto } from './dto/list-posts.query.dto';
 
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  // @Get()
-  // @Render('post/list')
-  // listPosts(@Query())
+  @Get()
+  @Render('post/list')
+  async listPosts(@Query() query: ListPostsQueryDto) {
+    const pageN = query.page ? query.page : 1;
+    const posts = await this.postService.postsPaged(pageN);
+    const pageNumber = posts.pageNumber;
+    const headInfo: Head = {
+      title: `Посты: страница ${pageNumber}`,
+      description: `Посты`,
+      keywords: 'Пост',
+      specificScripts: [],
+      specificModuleScripts: [],
+      specificStylesheets: [`/resources/styles/post/list.css`],
+      currentPageSection: 'Посты',
+    };
+    return Object.assign(
+      { layout: 'main' },
+      { ...defaultHeader },
+      defaultFooter,
+      headInfo,
+      {
+        posts: posts.data,
+        prevPage: pageNumber > 1 ? pageNumber - 1 : undefined,
+        nextPage:
+          pageNumber * posts.pageSize >= posts.postsCount
+            ? undefined
+            : pageNumber + 1,
+        pageNumber: pageNumber,
+      },
+    );
+  }
 
   @Get('new')
   @Render('post/new')
@@ -55,10 +86,9 @@ export class PostController {
   @Get(':postId')
   @Render('post/info')
   async getPost(
-    @Param('postId') id: string,
+    @Param('postId', ParseIntPipe) postId: number,
     @Query('loggedId') loggedId?: number,
   ) {
-    const postId = Number(id);
     const where: Prisma.PostWhereUniqueInput = {
       id: postId,
     };

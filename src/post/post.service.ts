@@ -13,6 +13,8 @@ import { conflict, notFound } from './exceptions';
 export class PostService {
   constructor(private prisma: PrismaService) {}
 
+  private readonly pageSize = 10;
+
   async posts(params: {
     skip?: number;
     take?: number;
@@ -28,6 +30,35 @@ export class PostService {
         cursor,
         where,
         orderBy,
+      });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async postsPaged(pageN: number) {
+    try {
+      return this.prisma.$transaction(async (tx) => {
+        const postsCount = await tx.post.count();
+        const skippedPagesN =
+          (pageN - 1) * this.pageSize >= postsCount
+            ? Math.max(0, Math.ceil(postsCount / this.pageSize) - 1)
+            : pageN - 1;
+        return {
+          data: await this.prisma.post.findMany({
+            skip: skippedPagesN * this.pageSize,
+            take: this.pageSize,
+            orderBy: {
+              id: 'desc',
+            },
+            include: {
+              author: true,
+            },
+          }),
+          postsCount: postsCount,
+          pageSize: this.pageSize,
+          pageNumber: skippedPagesN + 1,
+        };
       });
     } catch (e) {
       throw this.handleError(e);
