@@ -37,7 +37,7 @@ export class CreatePostDto {
   content: string;
 
   @ApiProperty({
-    example: '1',
+    example: 1,
     required: true,
     type: 'number',
     minimum: 1,
@@ -47,7 +47,6 @@ export class CreatePostDto {
   @IsPositive()
   authorId: number;
 
-  @IsArray()
   @ApiProperty({
     example: 'Коты',
     description: 'Название категории поста',
@@ -55,8 +54,9 @@ export class CreatePostDto {
     maxLength: 15,
     type: 'string',
   })
-  @IsString()
-  @MinLength(2)
-  @MaxLength(15)
+  @IsArray()
+  @IsString({ each: true })
+  @MinLength(2, { each: true })
+  @MaxLength(15, { each: true })
   categoryNames: string[];
 }
