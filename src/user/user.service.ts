@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { conflict, notFound } from './exceptions';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -14,7 +15,7 @@ export class UserService {
     include: Prisma.UserInclude,
   ): Promise<User> {
     try {
-      return this.prisma.user.create({
+      return await this.prisma.user.create({
         data: {
           username: data.username,
           profile: {
@@ -33,7 +34,7 @@ export class UserService {
     include: Prisma.UserInclude,
   ) {
     try {
-      return this.prisma.user.findUnique({
+      return await this.prisma.user.findUnique({
         where: userWhereUniqueInput,
         include: include,
       });
@@ -52,12 +53,42 @@ export class UserService {
   }) {
     const { skip, take, cursor, where, orderBy, include } = params;
     try {
-      return this.prisma.user.findMany({
+      return await this.prisma.user.findMany({
         skip: skip,
         take: take,
         cursor: cursor,
         where: where,
         orderBy: orderBy,
+        include: include,
+      });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async updateUser(
+    where: Prisma.UserWhereUniqueInput,
+    data: UpdateUserDto,
+    include: Prisma.UserInclude,
+  ): Promise<User> {
+    try {
+      return await this.prisma.user.update({
+        where: where,
+        data: data,
+        include: include,
+      });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async removeUser(
+    where: Prisma.UserWhereUniqueInput,
+    include: Prisma.UserInclude,
+  ): Promise<User> {
+    try {
+      return await this.prisma.user.delete({
+        where: where,
         include: include,
       });
     } catch (e) {

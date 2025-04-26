@@ -12,7 +12,9 @@ import {
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { filter, map } from 'rxjs';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController(true)
 @Controller()
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
@@ -54,21 +56,20 @@ export class CommentController {
   @Get('posts/:postId/comments')
   async listCommentsForPost(
     @Param('postId', ParseIntPipe) postId: number,
-    @Query('cursorId') cursorId?: string,
+    @Query('cursorId', new ParseIntPipe({ optional: true })) cursorId?: number,
   ) {
     const res = await this.commentService.commentsOfPostPaged(
       postId,
       cursorId ? +cursorId : undefined,
     );
     const cursorValid =
-      cursorId == null || res.length === 0 || res[0].id < +cursorId;
-    if (!cursorValid)
-      return {
-        cursorValid: false,
-      };
+      cursorId == null || res.length === 0 || res[0].id < cursorId;
+    console.log(res);
+    console.log(cursorId);
     return {
-      cursorValid: true,
+      cursorValid: cursorValid,
       data: res,
+      pageSize: this.commentService.pageSize,
     };
   }
 }

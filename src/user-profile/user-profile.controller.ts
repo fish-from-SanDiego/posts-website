@@ -18,16 +18,13 @@ import { Prisma } from '@prisma/client';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Response } from 'express';
 import { notFound } from './exceptions';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController(true)
 @Controller('users')
 export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) {}
 
-  // @Post()
-  // create(@Body() createUserProfileDto: CreateUserProfileDto) {
-  //   return this.userProfileService.create(createUserProfileDto);
-  // }
-  //
   @Get(':userId')
   @Render('user/profile/info')
   async getUserProfile(

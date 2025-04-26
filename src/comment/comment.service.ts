@@ -18,7 +18,7 @@ export interface CommentCreatedEvent {
 export class CommentService {
   constructor(private prisma: PrismaService) {}
 
-  private readonly pageSize = 10;
+  public readonly pageSize = 10;
   private commentsDeletionEvents = new Subject<CommentDeletedEvent>();
   private commentsCreationEvents = new Subject<CommentCreatedEvent>();
 

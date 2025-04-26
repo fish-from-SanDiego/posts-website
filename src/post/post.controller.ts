@@ -20,9 +20,10 @@ import defaultFooter from '../templateModels/footer.default';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Response } from 'express';
 import { notFound } from './exceptions';
-import { Min } from 'class-validator';
 import { ListPostsQueryDto } from './dto/list-posts.query.dto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController(true)
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
