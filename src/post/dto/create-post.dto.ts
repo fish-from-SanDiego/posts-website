@@ -48,7 +48,7 @@ export class CreatePostDto {
   authorId: number;
 
   @ApiProperty({
-    example: 'Коты',
+    example: ['Коты', 'Ещё что-нибудь'],
     description: 'Название категории поста',
     minLength: 2,
     maxLength: 15,
