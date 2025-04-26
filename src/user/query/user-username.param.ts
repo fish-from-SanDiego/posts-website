@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsNotEmpty,
   IsNotIn,
   IsString,
   Matches,
@@ -9,7 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class CreateUserDto {
+export class UserUsernameParam {
   @ApiProperty({
     example: 'user',
     description: 'Имя пользователя',

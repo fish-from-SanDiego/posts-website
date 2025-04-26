@@ -25,11 +25,6 @@ import { ApiExcludeController } from '@nestjs/swagger';
 export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) {}
 
-  // @Post()
-  // create(@Body() createUserProfileDto: CreateUserProfileDto) {
-  //   return this.userProfileService.create(createUserProfileDto);
-  // }
-  //
   @Get(':userId')
   @Render('user/profile/info')
   async getUserProfile(

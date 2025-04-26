@@ -13,7 +13,7 @@ import { conflict, notFound } from './exceptions';
 export class PostService {
   constructor(private prisma: PrismaService) {}
 
-  private readonly pageSize = 10;
+  public readonly pageSize = 10;
 
   async posts(params: {
     skip?: number;
@@ -63,6 +63,40 @@ export class PostService {
     } catch (e) {
       throw this.handleError(e);
     }
+  }
+
+  async postsByCategories(page: number, categoryNames?: string[]) {
+    const skip = (page - 1) * this.pageSize;
+
+    const where =
+      categoryNames && categoryNames.length > 0
+        ? {
+            categories: {
+              some: {
+                category: {
+                  name: { in: categoryNames },
+                },
+              },
+            },
+          }
+        : {};
+
+    const [posts, total] = await this.prisma.$transaction([
+      this.prisma.post.findMany({
+        where,
+        skip,
+        take: this.pageSize,
+        include: {
+          categories: {
+            include: { category: true },
+          },
+          author: true,
+        },
+      }),
+      this.prisma.post.count({ where }),
+    ]);
+
+    return { posts, total };
   }
 
   async post(where: Prisma.PostWhereUniqueInput) {

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import {
+  ApiBody,
   ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -33,6 +34,7 @@ export class CategoryApiController {
 
   @Post()
   @ApiOperation({ summary: 'Создание категории' })
+  @ApiBody({ type: CreateCategoryDto })
   @ApiResponse({
     status: 201,
     description: 'Успешное создание категории',
@@ -58,7 +60,7 @@ export class CategoryApiController {
         description: 'Header для пагинации',
         schema: {
           type: 'string',
-          example: '<https://host.com/api/categories/?page=2>; rel="next"',
+          example: '<https://host.com/api/categories?page=2>; rel="next"',
         },
       },
     },
@@ -109,6 +111,7 @@ export class CategoryApiController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Обновление значение имени для категории' })
+  @ApiBody({ type: UpdateCategoryDto })
   @ApiResponse({
     status: 200,
     description: 'Категория успешно обновлена',

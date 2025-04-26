@@ -13,7 +13,7 @@ export class UserProfileService {
     include: Prisma.UserProfileInclude,
   ) {
     try {
-      return this.prisma.userProfile.findUnique({
+      return await this.prisma.userProfile.findUnique({
         where: where,
         include: include,
       });
@@ -28,7 +28,7 @@ export class UserProfileService {
     include: Prisma.UserProfileInclude,
   ) {
     try {
-      return this.prisma.userProfile.update({
+      return await this.prisma.userProfile.update({
         data: {
           bio: data.bio,
           status: data.status,
