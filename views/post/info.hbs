@@ -56,8 +56,15 @@
       <span class="warning__text">Что-то пошло не так &mdash; комментарии не загрузились</span>
     </div>
     <script>
+      let loggedId = null;
+    </script>
+    {{#if loggedId}}
+      <script>
+        loggedId = Number('{{loggedId}}');
+      </script>
+    {{/if}}
+    <script>
       const postId = Number('{{post.id}}');
-      const loggedId = Number('{{loggedId}}');
       const commentMap = new Map();
       const commentStack = [];
       let latestId = null;
@@ -106,7 +113,7 @@
         commentElement.appendChild(text);
 
 
-        if (comment.author?.id === loggedId) {
+        if (comment.author != null && comment.author.id === loggedId) {
           const delBtn = document.createElement('button');
           delBtn.textContent = 'Удалить';
           delBtn.classList.add('comments__delete_button');
@@ -121,6 +128,7 @@
       }
 
       function addComments(comments) {
+        console.log('aaaaaa');
         for (const c of comments) {
           if (!commentMap.has(c.id)) {
             const el = createCommentElement(c);
@@ -130,6 +138,7 @@
             if (!latestId || c.id > latestId) latestId = c.id;
           }
         }
+        console.log('aaaaaa');
       }
 
       async function fetchInitialComments() {
@@ -138,12 +147,15 @@
         console.log(json.cursorValid);
         console.log(postId);
         if (json.cursorValid) {
+          console.log('aaaaaa');
+
           if (json.data.length === 0) {
             moreBtn.classList.add('hidden');
           }
           addComments(json.data);
+          console.log('aaaaaa');
           document.getElementById('post-comments-loader').classList.add('hidden');
-          document.getElementById('comments-form').classList.remove('hidden');
+          document.getElementById('comments-form')?.classList.remove('hidden');
           document.getElementById('comments-list').classList.remove('hidden');
           document.getElementById('load-more-comments').classList.remove('hidden');
         } else {
@@ -212,10 +224,10 @@
       });
 
 
-      document.getElementById('comments-form').addEventListener('submit', async function(event) {
+      document.getElementById('comments-form')?.addEventListener('submit', async function(event) {
         event.preventDefault();
 
-        const authorId = Number('{{loggedId}}');
+        const authorId = loggedId;
         const content = document.getElementById('comment-content').value;
         const postId = Number('{{post.id}}');
 
