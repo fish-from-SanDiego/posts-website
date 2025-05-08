@@ -67,7 +67,7 @@ export class PostService {
 
   async postsByCategories(page: number, categoryNames?: string[]) {
     const skip = (page - 1) * this.pageSize;
-
+    console.log(categoryNames);
     const where =
       categoryNames && categoryNames.length > 0
         ? {
@@ -95,7 +95,8 @@ export class PostService {
       }),
       this.prisma.post.count({ where }),
     ]);
-
+    console.log(posts);
+    console.log(total);
     return { posts, total };
   }
 

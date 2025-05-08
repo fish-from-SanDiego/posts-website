@@ -56,7 +56,7 @@ export class CommentService {
     include: Prisma.CommentInclude,
   ) {
     try {
-      return this.prisma.comment.findUnique({
+      return await this.prisma.comment.findUnique({
         where: where,
         include: include,
       });
@@ -75,7 +75,7 @@ export class CommentService {
   }): Promise<Comment[]> {
     try {
       const { skip, take, cursor, where, orderBy, include } = params;
-      return this.prisma.comment.findMany({
+      return await this.prisma.comment.findMany({
         skip: skip,
         take: take,
         cursor: cursor,
@@ -90,7 +90,7 @@ export class CommentService {
 
   async commentLastOfPost(postId: number) {
     try {
-      return this.comments({
+      return await this.comments({
         where: {
           postId: postId,
         },
@@ -107,7 +107,7 @@ export class CommentService {
   async commentsOfPostPaged(postId: number, cursorId?: number) {
     try {
       if (cursorId == null)
-        return this.comments({
+        return await this.comments({
           orderBy: { id: 'desc' },
           where: { postId: postId },
           take: this.pageSize,

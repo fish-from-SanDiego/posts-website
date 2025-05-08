@@ -101,7 +101,11 @@ export class PostController {
       description: `Пост ${post.title}`,
       keywords: 'Пост',
       specificScripts: [],
-      specificModuleScripts: ['/resources/js/components/spinning_loader.js'],
+      specificModuleScripts: [
+        '/resources/js/components/spinning_loader.js',
+        '/resources/js/post/comments/create_comment.js',
+        '/resources/js/post/comments/comments.js',
+      ],
       specificStylesheets: [
         `/resources/styles/post/info.css`,
         `/resources/styles/common/views_default.css`,
@@ -118,7 +122,8 @@ export class PostController {
         post: {
           id: post.id,
           createdAt: post.createdAt,
-          updatedAt: post.updatedAt,
+          updatedAt:
+            post.updatedAt == post.createdAt ? post.updatedAt : undefined,
           categories: post.categories.map((cat) => cat.category),
           title: post.title,
           content: post.content,

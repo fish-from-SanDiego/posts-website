@@ -1,6 +1,8 @@
 <head>
   <script>
-    const currentPageSection = '{{currentPageSection}}'
+    window.modelData = {{{json this}}};
+    console.log(window.modelData);
+    const currentPageSection = '{{currentPageSection}}';
   </script>
   <script src="/resources/js/up-button.js"></script>
   <script src="/resources/js/menu-link-current.js"></script>
