@@ -90,7 +90,7 @@ function setupSSE() {
     const eData = JSON.parse(data);
     const el = commentMap.get(eData.commentId);
     if (el) el.remove();
-    commentMap.delete(data.commentId);
+    commentMap.delete(eData.commentId);
   };
   window.onbeforeunload += function () {
     newEvt.close();
@@ -113,7 +113,7 @@ document
     const content = document.getElementById('comment-content').value;
 
     const data = {
-      content: content,
+      content: content.trim(),
       authorId: authorId,
       postId: postId,
     };
@@ -137,3 +137,16 @@ document
       console.log('Error occurred');
     }
   });
+
+document.addEventListener('DOMContentLoaded', function () {
+  const textarea = document.getElementById('comment-content');
+  const button = document.getElementById('submit-comment');
+
+  const toggleButtonState = () => {
+    button.disabled = textarea.value.trim() === '';
+  };
+
+  toggleButtonState();
+
+  textarea.addEventListener('input', toggleButtonState);
+});

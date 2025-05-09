@@ -197,7 +197,7 @@
 }
 
 .comments__form {
-    
+
 }
 
 .comments__form-button {
@@ -241,6 +241,7 @@
     justify-content: space-between;
     margin: 0 0 5px;
 }
+
 .comment-textarea {
     width: 100%;
     box-sizing: border-box;
@@ -286,6 +287,13 @@
     background: #505763;
 }
 
+.comments-form__submit-button:disabled {
+    background: #A0A0A0;
+    color: #E0E0E0;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 .show-more-button {
     margin: 5px 0 2px;
     align-self: center;
@@ -299,6 +307,7 @@
     transition: background 0.15s;
     border: none;
 }
+
 
 .show-more-button {
     background: #3A3F4A;

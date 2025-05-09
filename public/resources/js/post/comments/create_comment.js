@@ -25,7 +25,7 @@ export function createCommentElement(comment) {
     username.style.color = 'gray';
   }
 
-  const text = document.createElement('p');
+  const text = document.createElement('pre');
   text.classList.add('comments_comment-body');
   text.textContent = comment.content;
 
@@ -47,6 +47,6 @@ export function createCommentElement(comment) {
     commentElement.appendChild(delBtn);
   }
   commentElement.appendChild(hrElement);
-
+  
   return commentElement;
 }
