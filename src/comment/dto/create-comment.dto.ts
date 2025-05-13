@@ -1,12 +1,13 @@
-import { IsInt, IsNotEmpty, IsPositive, IsString } from 'class-validator';
+import { IsInt, IsPositive, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmptyTrimmed } from '../../decorators/is-not-empty-trimmed.decorator';
 
 export class CreateCommentDto {
   @ApiProperty({
     example: 1,
   })
-  @IsNotEmpty()
+  @IsNotEmptyTrimmed()
   @Type(() => String)
   @IsString()
   content: string;

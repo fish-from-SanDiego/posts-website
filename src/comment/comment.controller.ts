@@ -28,8 +28,6 @@ export class CommentController {
       ...createCommentDto,
       content: createCommentDto.content.trim(),
     };
-    if (trimmedDto.content.length === 0)
-      throw new BadRequestException("Comment length shouldn't be 0");
     return this.commentService.createComment(trimmedDto);
   }
 

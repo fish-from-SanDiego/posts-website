@@ -27,4 +27,6 @@ export class CreateUserDto {
     message: 'Имя пользователя не должно содержать посторонних символов',
   })
   username: string;
+
+
 }
