@@ -1,7 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { SessionRequest } from 'supertokens-node/framework/express';
 import { getSession } from 'supertokens-node/recipe/session';
-import { Error as STError } from 'supertokens-node';
 import { Response } from 'express';
 
 @Injectable()
@@ -14,8 +13,7 @@ export class UnauthorizedMiddleware implements NestMiddleware {
         checkDatabase: true,
       });
     } catch (error) {
-      console.log(error.type);
-      if (error instanceof STError && error.type === 'UNAUTHORISED') {
+      if (error.type === 'UNAUTHORISED') {
         res.redirect('/auth');
         // return;
       }

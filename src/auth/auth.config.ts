@@ -33,4 +33,5 @@ export function getSuperTokensConfig(appConfig: AppConfig): TypeInput {
       UserRoles.init(),
     ],
   };
+  await Session.createNewSession()
 }
