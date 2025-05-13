@@ -9,7 +9,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-
+import { SuperTokensAuthGuard } from 'supertokens-nestjs'
 export class CreatePostDto {
   @ApiProperty({
     example: 'Название поста',

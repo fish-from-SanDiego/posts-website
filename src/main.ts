@@ -11,14 +11,17 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalFilter } from './exception.filter';
 import { handlebarsHelpers } from './handlebars.helpers';
+import { AppConfig } from './config/app.config.type';
+import { getDomain } from './auth/auth.config';
+import supertokens from 'supertokens-node';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService<ConfigNamespaces>);
-
+  const appConfig = configService.getOrThrow<AppConfig>('app');
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-
+  
   app.engine(
     'hbs',
     hbs.engine({
@@ -39,9 +42,14 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
-  app.useGlobalFilters(new GlobalFilter());
-  await app.listen(configService.getOrThrow('app.port', { infer: true }));
+  SwaggerModule.setup('api/docs', app, documentFactory);
+  app.enableCors({
+    origin: [getDomain(appConfig.domain, appConfig.port)],
+    allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
+    credentials: true,
+  });
+  // app.useGlobalFilters(new GlobalFilter());
+  await app.listen(appConfig.port);
 }
 
 bootstrap();

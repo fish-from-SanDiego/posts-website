@@ -1,4 +1,4 @@
-﻿import { AppConfig } from './app-config.type';
+﻿import { AppConfig } from './app.config.type';
 
 export type ConfigNamespaces = {
   app : AppConfig

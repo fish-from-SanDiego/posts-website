@@ -11,7 +11,7 @@ export interface CommentDeletedEvent {
 }
 
 export interface CommentCreatedEvent {
-  comment: Awaited<ReturnType<typeof CommentService.prototype.createComment>>;
+  comment: any;
 }
 
 @Injectable()
@@ -19,8 +19,8 @@ export class CommentService {
   constructor(private prisma: PrismaService) {}
 
   public readonly pageSize = 10;
-  private commentsDeletionEvents = new Subject<CommentDeletedEvent>();
-  private commentsCreationEvents = new Subject<CommentCreatedEvent>();
+  public commentsDeletionEvents = new Subject<CommentDeletedEvent>();
+  public commentsCreationEvents = new Subject<CommentCreatedEvent>();
 
   public sendCommentDeletionObservable() {
     return this.commentsDeletionEvents.asObservable();

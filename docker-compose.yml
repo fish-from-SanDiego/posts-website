@@ -11,7 +11,13 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_DB=defaultdb
-
+  supertokens:
+    environment:
+      - ACCESS_TOKEN_VALIDITY=10
+      - REFRESH_TOKEN_VALIDITY=0.25
+    image: registry.supertokens.io/supertokens/supertokens-postgresql
+    ports:
+      - "3567:3567"
 
 volumes:
   db-data:

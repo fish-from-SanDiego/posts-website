@@ -12,6 +12,7 @@ import defaultFooter from './templateModels/footer.default';
 @Catch()
 export class GlobalFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
+    console.log('EXCEPTION:', exception);
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
@@ -50,6 +51,7 @@ export class GlobalFilter implements ExceptionFilter {
       response.status(status).json({
         statusCode: status,
         message: message,
+        timestamp: new Date().toISOString(),
       });
     }
   }

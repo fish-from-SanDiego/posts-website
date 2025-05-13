@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,12 +8,14 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Req,
   Sse,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { filter, map } from 'rxjs';
+import { filter, map, tap } from 'rxjs';
 import { ApiExcludeController } from '@nestjs/swagger';
+import { Request } from 'express';
 
 @ApiExcludeController(true)
 @Controller()
@@ -21,13 +24,20 @@ export class CommentController {
 
   @Post('comments')
   async createComment(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.createComment(createCommentDto);
+    const trimmedDto = {
+      ...createCommentDto,
+      content: createCommentDto.content.trim(),
+    };
+    if (trimmedDto.content.length === 0)
+      throw new BadRequestException("Comment length shouldn't be 0");
+    return this.commentService.createComment(trimmedDto);
   }
 
   @Sse('posts/:postId/comments/sse/deleted')
   sseOfPostDeleted(@Param('postId', ParseIntPipe) postId: number) {
     return this.commentService.sendCommentDeletionObservable().pipe(
       filter((event) => event.postId === postId),
+      tap((event) => console.log(`${event.commentId}: deleted`)),
       map((event) => ({
         event: 'commentDeleted',
         data: event,
@@ -39,6 +49,7 @@ export class CommentController {
   sseOfPostNew(@Param('postId', ParseIntPipe) postId: number) {
     return this.commentService.sendCommentCreationObservable().pipe(
       filter((event) => event.comment.postId === postId),
+      tap((event) => console.log(`${event.comment.id}: new`)),
       map((event) => ({
         event: 'commentCreated',
         data: event,
@@ -64,8 +75,6 @@ export class CommentController {
     );
     const cursorValid =
       cursorId == null || res.length === 0 || res[0].id < cursorId;
-    console.log(res);
-    console.log(cursorId);
     return {
       cursorValid: cursorValid,
       data: res,

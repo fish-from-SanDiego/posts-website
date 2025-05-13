@@ -3,12 +3,12 @@ import {
   Get,
   Param,
   Render,
-  NotFoundException,
   Query,
   Patch,
   Body,
   Res,
   ParseIntPipe,
+  UseGuards, UseFilters,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { Head } from '../templateModels/head.interface';
@@ -19,9 +19,14 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Response } from 'express';
 import { notFound } from './exceptions';
 import { ApiExcludeController } from '@nestjs/swagger';
+import { SuperTokensAuthGuard, VerifySession } from 'supertokens-nestjs';
+import { Session } from '../auth/session/session.decorator';
+import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
+import { SupertokensHtmlExceptionFilter } from '../auth/auth.filter';
 
 @ApiExcludeController(true)
 @Controller('users')
+// @UseFilters(SupertokensHtmlExceptionFilter)
 export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) {}
 
@@ -72,7 +77,11 @@ export class UserProfileController {
 
   @Get(':userId/edit')
   @Render('user/profile/edit')
-  async editInfoPage(@Param('userId', ParseIntPipe) userId: number) {
+  @UseGuards(new SuperTokensAuthGuard())
+  async editInfoPage(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Session() session: SessionContainerInterface,
+  ) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };

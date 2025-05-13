@@ -7,7 +7,7 @@ export class MethodOverrideMiddleware implements NestMiddleware {
     const method = req.body?._method || req.query?._method;
     if (method && ['PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())) {
       req.method = method.toUpperCase(); // Override the HTTP method
-      delete req.body._method; // Clean up the body
+      delete req  .body._method; // Clean up the body
     }
     next(); // Pass control to the next middleware or route handler
   }
