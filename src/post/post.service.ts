@@ -38,7 +38,7 @@ export class PostService {
 
   async postsPaged(pageN: number) {
     try {
-      return this.prisma.$transaction(async (tx) => {
+      return await this.prisma.$transaction(async (tx) => {
         const postsCount = await tx.post.count();
         const skippedPagesN =
           (pageN - 1) * this.pageSize >= postsCount

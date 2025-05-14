@@ -49,6 +49,7 @@ export class AuthModule implements NestModule {
       exports: [SupertokensService],
       imports: options.imports,
       module: AuthModule,
+      global: true,
     };
   }
 }

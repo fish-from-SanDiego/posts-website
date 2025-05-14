@@ -1,28 +1,56 @@
-import { Injectable } from '@nestjs/common';
+// noinspection ExceptionCaughtLocallyJS
+
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { conflict, notFound } from './exceptions';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { SupertokensService } from '../auth/supertokens/supertokens.service';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private stService: SupertokensService,
+  ) {}
 
   async createUser(
     data: CreateUserDto,
     include: Prisma.UserInclude,
   ): Promise<User> {
     try {
-      return await this.prisma.user.create({
-        data: {
-          username: data.username,
-          profile: {
-            create: {} as Prisma.UserProfileCreateWithoutUserInput,
+      return await this.prisma.$transaction(async (tx) => {
+        const usernameExists =
+          (await tx.user.findUnique({
+            where: { username: data.username },
+          })) != null;
+        if (usernameExists)
+          throw new ConflictException('User sign up: username already exists');
+        const signUpResult = await this.stService.signUpEmail(
+          data.email,
+          data.password,
+        );
+        if (signUpResult.status === 'EMAIL_ALREADY_EXISTS_ERROR') {
+          throw new ConflictException('User sign up: email already exists');
+        } else if (signUpResult.status !== 'OK') {
+          throw new BadRequestException('Email sign up failed');
+        }
+        return tx.user.create({
+          data: {
+            username: data.username,
+            supertokensId: signUpResult.user.id,
+            profile: {
+              create: {} as Prisma.UserProfileCreateWithoutUserInput,
+            },
           },
-        },
-        include: include,
+          include: include,
+        });
       });
     } catch (e) {
       throw this.handleError(e);
@@ -70,7 +98,7 @@ export class UserService {
     where: Prisma.UserWhereUniqueInput,
     data: UpdateUserDto,
     include: Prisma.UserInclude,
-  ): Promise<User> {
+  ): Promise<Omit<User, 'supertokensId'>> {
     try {
       return await this.prisma.user.update({
         where: where,
@@ -85,7 +113,7 @@ export class UserService {
   async removeUser(
     where: Prisma.UserWhereUniqueInput,
     include: Prisma.UserInclude,
-  ): Promise<User> {
+  ): Promise<Omit<User, 'supertokensId'>> {
     try {
       return await this.prisma.user.delete({
         where: where,

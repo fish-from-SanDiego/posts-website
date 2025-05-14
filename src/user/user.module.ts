@@ -4,9 +4,10 @@ import { UserController } from './user.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UserApiController } from './user.api.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, AuthModule],
   controllers: [UserController, UserApiController],
   providers: [UserService],
 })

@@ -71,4 +71,8 @@ export class SupertokensService
   async signInEmail(email: string, password: string) {
     return EmailPassword.signIn('public', email, password);
   }
+
+  async deleteAccountEmail(supertokensUserId: string) {
+    return supertokens.deleteUser(supertokensUserId);
+  }
 }
