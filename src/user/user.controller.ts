@@ -1,20 +1,11 @@
 import { Controller, Post, Body, Res } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { Response } from 'express';
 import { ApiExcludeController } from '@nestjs/swagger';
 
 @ApiExcludeController(true)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    const include = {};
-    const user = await this.userService.createUser(createUserDto, include);
-    return res.redirect(`/users/${user.id}`);
-  }
 
   // @Get()
   // findAll() {

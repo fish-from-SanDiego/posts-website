@@ -14,6 +14,7 @@ import { handlebarsHelpers } from './handlebars.helpers';
 import { AppConfig } from './config/app.config.type';
 import { getDomain } from './auth/auth.config';
 import supertokens from 'supertokens-node';
+import { SessionPayloadMiddleware } from './auth/session/session.payload.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -34,7 +35,10 @@ async function bootstrap() {
   app.setViewEngine('hbs');
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
-  app.use(new MethodOverrideMiddleware().use);
+  app.use(
+    new MethodOverrideMiddleware().use,
+    new SessionPayloadMiddleware().use,
+  );
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = new DocumentBuilder()
     .setTitle('API сайта')

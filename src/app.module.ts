@@ -14,13 +14,14 @@ import appConfig from './config/app.config';
 import { ConfigNamespaces } from './config/config.namespaces';
 import { AppConfig } from './config/app.config.type';
 import { getSuperTokensConfig } from './auth/auth.config';
-import { AuthMiddleware } from './auth/auth.middleware';
+import adminConfig from './config/admin.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.app.env'],
-      load: [appConfig],
+      load: [appConfig, adminConfig],
+      isGlobal: true,
     }),
     AuthModule.forRootAsync({
       inject: [ConfigService],
@@ -35,12 +36,7 @@ import { AuthMiddleware } from './auth/auth.middleware';
           appInfo: superTokensConfig.appInfo,
         };
       },
-      imports: [
-        ConfigModule.forRoot({
-          envFilePath: ['.app.env'],
-          load: [appConfig],
-        }),
-      ],
+      imports: [],
     }),
     PrismaModule,
     UserModule,
@@ -54,8 +50,4 @@ import { AuthMiddleware } from './auth/auth.middleware';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    // consumer.apply(AuthMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}

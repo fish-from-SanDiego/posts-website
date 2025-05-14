@@ -27,6 +27,7 @@ import { CategoryIdParam } from './query/category.id.param';
 import { notFound } from './exceptions';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
+import { PublicAccess } from 'supertokens-nestjs';
 
 @ApiTags('categories')
 @Controller('api/categories')

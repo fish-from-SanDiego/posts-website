@@ -1,8 +1,10 @@
-﻿import {
-  ExceptionFilter,
-  Catch,
+﻿/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import {
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Head } from './templateModels/head.interface';
@@ -11,8 +13,7 @@ import defaultFooter from './templateModels/footer.default';
 
 @Catch()
 export class GlobalFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
-    console.log('EXCEPTION:', exception);
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
@@ -21,11 +22,21 @@ export class GlobalFilter implements ExceptionFilter {
 
     const isHtml = accept && accept.includes('text/html');
     const status =
-      exception instanceof HttpException ? exception.getStatus() : 500;
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : exception.type != null &&
+            (exception.type === 'UNAUTHORISED' ||
+              exception.type === 'TRY_REFRESH_TOKEN')
+          ? HttpStatus.UNAUTHORIZED
+          : HttpStatus.INTERNAL_SERVER_ERROR;
     const message =
       exception instanceof HttpException
         ? exception.message
-        : 'Internal server error';
+        : exception.type != null &&
+            (exception.type === 'UNAUTHORISED' ||
+              exception.type === 'TRY_REFRESH_TOKEN')
+          ? 'Unauthorized; try login'
+          : 'Internal Server Error';
     console.log(exception);
     if (isHtml) {
       const headInfo: Head = {

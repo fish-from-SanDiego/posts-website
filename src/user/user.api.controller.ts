@@ -13,7 +13,8 @@ import {
   Get,
   Param,
   Patch,
-  Post, Query,
+  Post,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserIdParam } from './query/user-id.param';
@@ -71,20 +72,6 @@ export class UserApiController {
     );
     if (res == null) throw notFound();
     return res;
-  }
-
-  @ApiOperation({
-    summary: 'Создать пользователя',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Успешное создание пользователя',
-    type: UserDto,
-  })
-  @ApiBody({ type: CreateUserDto })
-  @Post()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createUser(createUserDto, {});
   }
 
   @ApiOperation({

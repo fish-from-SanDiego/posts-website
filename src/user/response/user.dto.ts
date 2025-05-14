@@ -6,5 +6,5 @@ export class UserDto {
   @ApiProperty({ example: 'user' })
   username: string;
   @ApiProperty({ example: '/users/2/pic.png' })
-  pictureUrl?: string;
+  pictureUrl: string | null;
 }

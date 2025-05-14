@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 import {
   Inject,
@@ -9,17 +10,16 @@ import {
   AuthModuleConfig,
   SupertokensConfigInjectionToken,
 } from '../auth.config.type';
-import supertokens from 'supertokens-node';
+import supertokens, { RecipeUserId } from 'supertokens-node';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { Role } from './roles.dto';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Dashboard from 'supertokens-node/recipe/dashboard';
 import Session from 'supertokens-node/recipe/session';
+import { User as STUser } from 'supertokens-node';
 
 @Injectable()
-export class SupertokensService
-  implements OnModuleInit, OnApplicationBootstrap
-{
+export class SupertokensService implements OnModuleInit {
   constructor(
     @Inject(SupertokensConfigInjectionToken) private config: AuthModuleConfig,
   ) {
@@ -42,11 +42,9 @@ export class SupertokensService
     });
   }
 
-  async onApplicationBootstrap() {
+  async onModuleInit() {
     await this.initRoles();
   }
-
-  async onModuleInit() {}
 
   private async initRoles() {
     const existingRolesSet = new Set((await UserRoles.getAllRoles()).roles);
@@ -90,5 +88,29 @@ export class SupertokensService
       supertokensUserId,
       role.toString(),
     );
+  }
+
+  async findUsersByEmail(email: string) {
+    return supertokens.listUsersByAccountInfo('public', { email: email });
+  }
+
+  async createSession(
+    req: any,
+    res: any,
+    stUser: { recipeUserId: RecipeUserId; user: STUser },
+    accessTokenPayload?: any,
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return Session.createNewSession(
+      req,
+      res,
+      'public',
+      stUser.recipeUserId,
+      accessTokenPayload,
+    );
+  }
+
+  async revokeSession(handle: string) {
+    return Session.revokeSession(handle);
   }
 }

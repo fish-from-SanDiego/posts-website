@@ -14,7 +14,7 @@ export class UnauthorizedMiddleware implements NestMiddleware {
       });
     } catch (error) {
       if (error.type === 'UNAUTHORISED') {
-        res.redirect('/auth');
+        res.redirect('/login');
         // return;
       }
     }

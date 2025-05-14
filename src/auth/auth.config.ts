@@ -19,8 +19,6 @@ export function getSuperTokensConfig(appConfig: AppConfig): AuthModuleConfig {
       appName: 'My App',
       apiDomain: getDomain(appConfig.domain, appConfig.port),
       websiteDomain: getDomain(appConfig.domain, appConfig.port),
-      apiBasePath: '/auth',
-      websiteBasePath: '/auth',
     },
     apiKey: appConfig.superTokensApiKey,
   };

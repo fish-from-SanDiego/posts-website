@@ -8,7 +8,8 @@ import {
   Body,
   Res,
   ParseIntPipe,
-  UseGuards, UseFilters,
+  UseGuards,
+  UseFilters,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { Head } from '../templateModels/head.interface';
@@ -19,23 +20,27 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Response } from 'express';
 import { notFound } from './exceptions';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { PublicAccess, SuperTokensAuthGuard, VerifySession } from 'supertokens-nestjs';
+import {
+  PublicAccess,
+  SuperTokensAuthGuard,
+  VerifySession,
+} from 'supertokens-nestjs';
 import { Session } from '../auth/session/session.decorator';
 import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
 import { SupertokensHtmlExceptionFilter } from '../auth/auth.filter';
+import { RolesGuard } from '../auth/supertokens/roles.guard';
 
 @ApiExcludeController(true)
 @Controller('users')
-// @UseFilters(SupertokensHtmlExceptionFilter)
+@UseFilters(SupertokensHtmlExceptionFilter)
+@UseGuards(new SuperTokensAuthGuard(), RolesGuard)
 export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) {}
 
   @Get(':userId')
   @Render('user/profile/info')
-  async getUserProfile(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Query('loggedId', new ParseIntPipe({ optional: true })) loggedId?: number,
-  ) {
+  @PublicAccess()
+  async getUserProfile(@Param('userId', ParseIntPipe) userId: number) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
@@ -70,15 +75,14 @@ export class UserProfileController {
         profileImageUrl: user.pictureUrl,
         status: userProfile.status,
         bio: userProfile.bio,
-        loggedId: loggedId ? loggedId : undefined,
       },
     );
   }
 
   @Get(':userId/edit')
   @Render('user/profile/edit')
-  @UseGuards(new SuperTokensAuthGuard())
   @PublicAccess()
+  @VerifySession({})
   async editInfoPage(
     @Param('userId', ParseIntPipe) userId: number,
     @Session() session: SessionContainerInterface,

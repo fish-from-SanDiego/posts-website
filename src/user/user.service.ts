@@ -4,6 +4,9 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
+  OnModuleInit,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,18 +15,45 @@ import { Prisma, User } from '@prisma/client';
 import { conflict, notFound } from './exceptions';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SupertokensService } from '../auth/supertokens/supertokens.service';
+import { ConfigService } from '@nestjs/config';
+import { ConfigNamespaces } from '../config/config.namespaces';
+import { AdminConfig } from '../config/admin.config.type';
+import { Role } from '../auth/supertokens/roles.dto';
+import { RecipeUserId, User as STUser } from 'supertokens-node';
 
 @Injectable()
-export class UserService {
+export class UserService implements OnModuleInit {
   constructor(
     private prisma: PrismaService,
+    private configService: ConfigService<ConfigNamespaces>,
     private stService: SupertokensService,
   ) {}
+
+  async onModuleInit() {
+    const adminConfig = this.configService.getOrThrow<AdminConfig>('admin');
+    const usernameExists =
+      (await this.user({ username: adminConfig.username }, {})) != null;
+    const emailExists =
+      (await this.stService.findUsersByEmail(adminConfig.email)).length !== 0;
+    // const passwordExists = ...
+    // (just kidding)
+    if (!usernameExists && !emailExists) {
+      const [admin, stAdmin] = await this.createUser(
+        {
+          username: adminConfig.username,
+          email: adminConfig.email,
+          password: adminConfig.password,
+        },
+        {},
+      );
+      await this.stService.assignRole(stAdmin.user.id, Role.Admin);
+    }
+  }
 
   async createUser(
     data: CreateUserDto,
     include: Prisma.UserInclude,
-  ): Promise<User> {
+  ): Promise<[User, { user: STUser; recipeUserId: RecipeUserId }]> {
     try {
       return await this.prisma.$transaction(async (tx) => {
         const usernameExists =
@@ -39,18 +69,26 @@ export class UserService {
         if (signUpResult.status === 'EMAIL_ALREADY_EXISTS_ERROR') {
           throw new ConflictException('User sign up: email already exists');
         } else if (signUpResult.status !== 'OK') {
-          throw new BadRequestException('Email sign up failed');
+          throw new InternalServerErrorException();
         }
-        return tx.user.create({
-          data: {
-            username: data.username,
-            supertokensId: signUpResult.user.id,
-            profile: {
-              create: {} as Prisma.UserProfileCreateWithoutUserInput,
+        const rolesResult = await this.stService.assignRole(
+          signUpResult.user.id,
+          Role.User,
+        );
+
+        return [
+          await tx.user.create({
+            data: {
+              username: data.username,
+              supertokensId: signUpResult.user.id,
+              profile: {
+                create: {} as Prisma.UserProfileCreateWithoutUserInput,
+              },
             },
-          },
-          include: include,
-        });
+            include: include,
+          }),
+          signUpResult,
+        ];
       });
     } catch (e) {
       throw this.handleError(e);
@@ -102,11 +140,33 @@ export class UserService {
   ) {
     try {
       const user = await this.prisma.user.findUnique({
-        include: options?.include ?? {},
+        include: options?.include,
         where: { supertokensId: supertokensId },
       });
       if (user == null) throw notFound();
       return user;
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async loginUser(
+    email: string,
+    password: string,
+    options?: { include?: Prisma.UserInclude },
+  ): Promise<[User, { user: STUser; recipeUserId: RecipeUserId }]> {
+    try {
+      const result = await this.stService.signInEmail(email, password);
+      if (result.status === 'WRONG_CREDENTIALS_ERROR') {
+        throw new UnauthorizedException('Wrong credentials');
+      } else if (result.status !== 'OK') {
+        throw new InternalServerErrorException();
+      }
+      const stUserResult = result;
+      return [
+        await this.getUserBySupertokensId(stUserResult.user.id, options),
+        stUserResult,
+      ];
     } catch (e) {
       throw this.handleError(e);
     }
