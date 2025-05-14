@@ -48,7 +48,7 @@ export class SupertokensService
 
   async onModuleInit() {}
 
-  async initRoles() {
+  private async initRoles() {
     const existingRolesSet = new Set((await UserRoles.getAllRoles()).roles);
     const appRolesSet = new Set(Object.values(Role).map((it) => it.toString()));
     for (const role of appRolesSet) {
@@ -72,7 +72,23 @@ export class SupertokensService
     return EmailPassword.signIn('public', email, password);
   }
 
-  async deleteAccountEmail(supertokensUserId: string) {
+  async deleteAccountById(supertokensUserId: string) {
     return supertokens.deleteUser(supertokensUserId);
+  }
+
+  async assignRole(supertokensUserId: string, role: Role) {
+    return UserRoles.addRoleToUser(
+      'public',
+      supertokensUserId,
+      role.toString(),
+    );
+  }
+
+  async removeRoleFromUser(supertokensUserId: string, role: Role) {
+    return UserRoles.removeUserRole(
+      'public',
+      supertokensUserId,
+      role.toString(),
+    );
   }
 }

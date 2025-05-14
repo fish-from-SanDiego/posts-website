@@ -94,6 +94,24 @@ export class UserService {
     }
   }
 
+  async getUserBySupertokensId(
+    supertokensId: string,
+    options?: {
+      include?: Prisma.UserInclude;
+    },
+  ) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        include: options?.include ?? {},
+        where: { supertokensId: supertokensId },
+      });
+      if (user == null) throw notFound();
+      return user;
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
   async updateUser(
     where: Prisma.UserWhereUniqueInput,
     data: UpdateUserDto,
