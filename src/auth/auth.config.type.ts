@@ -7,5 +7,4 @@ export type AuthModuleConfig = {
   appInfo: AppInfo;
   connectionURI: string;
   apiKey?: string;
-  recipeList: RecipeListFunction[];
 };

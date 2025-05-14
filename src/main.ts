@@ -48,7 +48,7 @@ async function bootstrap() {
     allowedHeaders: ['content-type', ...supertokens.getAllCORSHeaders()],
     credentials: true,
   });
-  // app.useGlobalFilters(new GlobalFilter());
+  app.useGlobalFilters(new GlobalFilter());
   await app.listen(appConfig.port);
 }
 

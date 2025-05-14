@@ -26,6 +26,7 @@ import { CategoryDto } from './responseData/categoryDto';
 import { CategoryIdParam } from './query/category.id.param';
 import { notFound } from './exceptions';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import EmailPassword from 'supertokens-node/recipe/emailpassword';
 
 @ApiTags('categories')
 @Controller('api/categories')

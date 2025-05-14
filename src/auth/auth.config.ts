@@ -4,17 +4,17 @@ import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Session from 'supertokens-node/recipe/session';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import Dashboard from 'supertokens-node/recipe/dashboard';
+import { AuthModuleConfig } from './auth.config.type';
+
+// import ThirdParty from 'supertokens-node/recipe/thirdparty';
 
 export function getDomain(domainBase: string, port: number) {
   return `${domainBase}:${port}`;
 }
 
-export function getSuperTokensConfig(appConfig: AppConfig): TypeInput {
-  console.log(getDomain(appConfig.domain, appConfig.port));
+export function getSuperTokensConfig(appConfig: AppConfig): AuthModuleConfig {
   return {
-    supertokens: {
-      connectionURI: appConfig.superTokensConnectionUrl,
-    },
+    connectionURI: appConfig.superTokensConnectionUrl,
     appInfo: {
       appName: 'My App',
       apiDomain: getDomain(appConfig.domain, appConfig.port),
@@ -22,16 +22,6 @@ export function getSuperTokensConfig(appConfig: AppConfig): TypeInput {
       apiBasePath: '/auth',
       websiteBasePath: '/auth',
     },
-    recipeList: [
-      Dashboard.init(),
-      EmailPassword.init(),
-      Session.init({
-        getTokenTransferMethod: (input) => {
-          return 'cookie';
-        },
-      }),
-      UserRoles.init(),
-    ],
+    apiKey: appConfig.superTokensApiKey,
   };
-  await Session.createNewSession()
 }

@@ -22,6 +22,7 @@ import { Response } from 'express';
 import { notFound } from './exceptions';
 import { ListPostsQueryDto } from './dto/list-posts.query.dto';
 import { ApiExcludeController } from '@nestjs/swagger';
+import { VerifySession } from 'supertokens-nestjs';
 
 @ApiExcludeController(true)
 @Controller('posts')
@@ -30,6 +31,9 @@ export class PostController {
 
   @Get()
   @Render('post/list')
+  @VerifySession({
+    
+  })
   async listPosts(@Query() query: ListPostsQueryDto) {
     const pageN = query.page ? query.page : 1;
     const posts = await this.postService.postsPaged(pageN);

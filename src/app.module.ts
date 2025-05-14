@@ -29,11 +29,10 @@ import { AuthMiddleware } from './auth/auth.middleware';
         const superTokensConfig = getSuperTokensConfig(appConfig);
         return {
           connectionURI:
-            superTokensConfig.supertokens?.connectionURI ??
+            superTokensConfig.connectionURI ??
             appConfig.superTokensConnectionUrl,
           apiKey: appConfig.superTokensApiKey,
           appInfo: superTokensConfig.appInfo,
-          recipeList: superTokensConfig.recipeList,
         };
       },
       imports: [
@@ -57,6 +56,6 @@ import { AuthMiddleware } from './auth/auth.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('*');
+    // consumer.apply(AuthMiddleware).forRoutes('*');
   }
 }

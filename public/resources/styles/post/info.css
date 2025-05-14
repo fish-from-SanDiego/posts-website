@@ -62,11 +62,17 @@
     font-style: italic;
 }
 
-.post__dates {
+.post__dates, .comment__dates {
     font-family: "Open Sans", sans-serif;
     text-align: end;
     font-size: 1.8rem;
     color: #666;
+}
+
+.comment__dates {
+    align-self: center;
+    margin-left: auto;
+    margin-right: 0;
 }
 
 .post__date--updated {
