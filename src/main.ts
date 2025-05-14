@@ -21,7 +21,7 @@ async function bootstrap() {
   const appConfig = configService.getOrThrow<AppConfig>('app');
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  
+
   app.engine(
     'hbs',
     hbs.engine({
@@ -40,6 +40,11 @@ async function bootstrap() {
     .setTitle('API сайта')
     .setDescription('API')
     .setVersion('1.0')
+    .addCookieAuth('sAccessToken', {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    })
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, documentFactory);

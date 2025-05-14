@@ -16,6 +16,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { filter, map, tap } from 'rxjs';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { Request } from 'express';
+import { VerifySession } from 'supertokens-nestjs';
 
 @ApiExcludeController(true)
 @Controller()
@@ -23,6 +24,7 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post('comments')
+  @VerifySession()
   async createComment(@Body() createCommentDto: CreateCommentDto) {
     const trimmedDto = {
       ...createCommentDto,
