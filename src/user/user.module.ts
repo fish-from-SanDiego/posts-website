@@ -11,5 +11,6 @@ import { UserSessionApiController } from './user.session.api.controller';
   imports: [PrismaModule, AuthModule],
   controllers: [UserController, UserApiController, UserSessionApiController],
   providers: [UserService],
+  exports: [UserService],
 })
 export class UserModule {}

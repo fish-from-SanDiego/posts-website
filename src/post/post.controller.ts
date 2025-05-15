@@ -11,6 +11,8 @@ import {
   Query,
   Res,
   ParseIntPipe,
+  UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Prisma } from '@prisma/client';
@@ -22,19 +24,28 @@ import { Response } from 'express';
 import { notFound } from './exceptions';
 import { ListPostsQueryDto } from './dto/list-posts.query.dto';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { VerifySession } from 'supertokens-nestjs';
+import {
+  PublicAccess,
+  SuperTokensAuthGuard,
+  VerifySession,
+} from 'supertokens-nestjs';
+import { SupertokensHtmlExceptionFilter } from '../auth/auth.filter';
+import { Role } from '../auth/supertokens/roles.dto';
 
 @ApiExcludeController(true)
 @Controller('posts')
+@UseFilters(SupertokensHtmlExceptionFilter)
+@UseGuards(new SuperTokensAuthGuard())
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
   @Render('post/list')
-  @VerifySession({
-    
-  })
-  async listPosts(@Query() query: ListPostsQueryDto) {
+  @PublicAccess()
+  async listPosts(
+    @Query() query: ListPostsQueryDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const pageN = query.page ? query.page : 1;
     const posts = await this.postService.postsPaged(pageN);
     const pageNumber = posts.pageNumber;
@@ -48,6 +59,7 @@ export class PostController {
       currentPageSection: 'Посты',
     };
     return Object.assign(
+      { ...res.locals },
       { layout: 'main' },
       { ...defaultHeader },
       defaultFooter,

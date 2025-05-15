@@ -17,13 +17,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserIdParam } from './query/user-id.param';
+import { UserIdParam } from './dto/user-id.param';
 import { notFound } from './exceptions';
 import { CategoryDto } from '../category/responseData/categoryDto';
-import { UserDto } from './response/user.dto';
+import { UserDto } from './dto/user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserUsernameParam } from './query/user-username.param';
+import { UserUsernameParam } from './dto/user-username.param';
 
 @ApiTags('users')
 @Controller('api/users')

@@ -75,6 +75,8 @@ export class UserService implements OnModuleInit {
           signUpResult.user.id,
           Role.User,
         );
+        if (rolesResult.status === 'UNKNOWN_ROLE_ERROR')
+          throw new InternalServerErrorException();
 
         return [
           await tx.user.create({

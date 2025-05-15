@@ -19,6 +19,7 @@ export class SessionPayloadMiddleware implements NestMiddleware {
       if (session == null) res.locals.currentUser = null;
       else {
         const payload = session.getAccessTokenPayload();
+        console.log(payload);
         res.locals.currentUser = {
           username: payload.username,
           id: payload.userId,

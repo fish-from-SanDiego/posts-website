@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
-import { UserIdParam } from '../user/query/user-id.param';
+import { UserIdParam } from '../user/dto/user-id.param';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { UserProfileDto } from './response/user-profile.dto';
 

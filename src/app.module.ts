@@ -14,6 +14,7 @@ import appConfig from './config/app.config';
 import { ConfigNamespaces } from './config/config.namespaces';
 import { AppConfig } from './config/app.config.type';
 import { getSuperTokensConfig } from './auth/auth.config';
+import { CaslModule } from './casl/casl.module';
 import adminConfig from './config/admin.config';
 
 @Module({
@@ -46,6 +47,7 @@ import adminConfig from './config/admin.config';
     CommentModule,
     LikeModule,
     AuthModule,
+    CaslModule,
   ],
   controllers: [AppController],
   providers: [AppService],

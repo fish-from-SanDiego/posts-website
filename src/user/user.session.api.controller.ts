@@ -21,7 +21,7 @@ import { UserService } from './user.service';
 import { SupertokensService } from '../auth/supertokens/supertokens.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Request, Response } from 'express';
-import { UserDto } from './response/user.dto';
+import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import {
   PublicAccess,

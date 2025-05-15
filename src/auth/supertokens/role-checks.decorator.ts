@@ -1,15 +1,16 @@
-import { SetMetadata } from '@nestjs/common';
 import { SessionRequest } from 'supertokens-node/framework/express';
+import { Reflector } from '@nestjs/core';
 
-export const ROLE_CHECKS_KEY = 'role_checks';
-export type RoleCheck = (resourceOwnerId: number) => boolean;
-export type GetOwnerIdFunction = (req: SessionRequest) => number;
+export type RoleCheck = (
+  req: SessionRequest,
+  resourceData: any,
+) => boolean | Promise<boolean>;
+export type GetResourceDataFunction = (req: SessionRequest) => any;
 export type RoleChecksMap = {
   [key: string]: RoleCheck;
 };
 export type RoleChecksOptions = {
-  setupFunction: GetOwnerIdFunction;
+  setupFunction: GetResourceDataFunction;
   roleChecksMap: RoleChecksMap;
 };
-export const RoleChecks = (options: RoleChecksOptions) =>
-  SetMetadata(ROLE_CHECKS_KEY, options);
+export const RoleChecks = Reflector.createDecorator<RoleChecksOptions>();

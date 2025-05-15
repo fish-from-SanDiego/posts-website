@@ -10,6 +10,8 @@ import {
   ParseIntPipe,
   UseGuards,
   UseFilters,
+  UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { Head } from '../templateModels/head.interface';
@@ -29,18 +31,42 @@ import { Session } from '../auth/session/session.decorator';
 import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
 import { SupertokensHtmlExceptionFilter } from '../auth/auth.filter';
 import { RolesGuard } from '../auth/supertokens/roles.guard';
+import { SessionRequest } from 'supertokens-node/framework/express';
+import { UserService } from '../user/user.service';
 
 @ApiExcludeController(true)
 @Controller('users')
 @UseFilters(SupertokensHtmlExceptionFilter)
 @UseGuards(new SuperTokensAuthGuard(), RolesGuard)
 export class UserProfileController {
-  constructor(private readonly userProfileService: UserProfileService) {}
+  constructor(
+    private readonly userProfileService: UserProfileService,
+    private readonly userService: UserService,
+  ) {}
+
+  async getUser(req: SessionRequest) {
+    const id = req.session?.getUserId();
+    if (id == null) throw new UnauthorizedException();
+    return await this.userService.getUserBySupertokensId(id);
+  }
+
+  private getUserIdParam(req: SessionRequest) {
+    try {
+      return parseInt(req.params['userId']);
+    } catch (e) {
+      throw new BadRequestException(
+        'Validation failed (numeric string is expected)',
+      );
+    }
+  }
 
   @Get(':userId')
   @Render('user/profile/info')
   @PublicAccess()
-  async getUserProfile(@Param('userId', ParseIntPipe) userId: number) {
+  async getUserProfile(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
@@ -66,8 +92,13 @@ export class UserProfileController {
       currentPageSection: 'Профиль',
     };
     return Object.assign(
-      { layout: 'main' },
-      { ...defaultHeader },
+      { ...res.locals },
+      {
+        layout: 'main',
+      },
+      {
+        ...defaultHeader,
+      },
       defaultFooter,
       headInfo,
       {
@@ -81,8 +112,7 @@ export class UserProfileController {
 
   @Get(':userId/edit')
   @Render('user/profile/edit')
-  @PublicAccess()
-  @VerifySession({})
+  @VerifySession()
   async editInfoPage(
     @Param('userId', ParseIntPipe) userId: number,
     @Session() session: SessionContainerInterface,
@@ -145,10 +175,4 @@ export class UserProfileController {
     );
     return res.redirect(`/users/${userId}`);
   }
-
-  //
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.userProfileService.remove(+id);
-  // }
 }
