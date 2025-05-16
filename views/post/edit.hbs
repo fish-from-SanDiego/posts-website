@@ -14,7 +14,7 @@
     <div class="form__group">
       <label class="form__label">Категории:</label>
       <div id="category-container">
-        {{#if post.categoryNames}}
+        {{#if post.categories}}
           {{#each post.categories}}
             <div class="category-input">
               <input value="{{this.name}}" type="text" name="categoryNames" class="form__input"
