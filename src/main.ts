@@ -15,6 +15,8 @@ import { AppConfig } from './config/app.config.type';
 import { getDomain } from './auth/auth.config';
 import supertokens from 'supertokens-node';
 import { SessionPayloadMiddleware } from './auth/session/session.payload.middleware';
+import { ElapsedTimeInterceptor } from './elapsed.time.interceptor';
+import { ClientCacheInterceptor } from './client.cache.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -38,6 +40,10 @@ async function bootstrap() {
   app.use(
     new MethodOverrideMiddleware().use,
     new SessionPayloadMiddleware().use,
+  );
+  app.useGlobalInterceptors(
+    new ElapsedTimeInterceptor(),
+    new ClientCacheInterceptor(),
   );
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   const config = new DocumentBuilder()

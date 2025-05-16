@@ -1,0 +1,122 @@
+@import "../../reset.css";
+@import "../../common/body.css";
+@import "../../common/header.css";
+@import "../../common/common_blocks.css";
+@import "../../common/footer.css";
+@import "../../common/views_default.css";
+@import "../../common/main.css";
+@import "../../fonts/open_sans.css";
+
+.vertical-container__main-item {
+    margin: 10px auto;
+}
+
+a.vertical-container__main-item-link {
+    font-family: "Open Sans", sans-serif;
+    font-size: 2.4rem;
+    font-weight: 450;
+    padding: 10px 10px;
+    display: block;
+    text-decoration: none;
+    color: #EDE8F5;
+    text-align: center;
+    margin: auto;
+}
+
+a.vertical-container__main-item-link:hover {
+    text-decoration: none;
+    color: antiquewhite;
+}
+
+.vertical-container {
+    box-sizing: border-box;
+    width: clamp(300px, 100%, 720px);
+}
+
+.form {
+    margin: 0 auto;
+    font-size: 2rem;
+    background-color: white;
+    box-shadow: 0 0 2px gray;
+    flex: 1 0;
+    /*max-width: 100%;*/
+    /*max-width: clamp(300px, 70%, 1200px);*/
+    box-sizing: border-box;
+    padding: 10px;
+    width: 100%;
+}
+
+.form__title {
+    font-family: "Open Sans", sans-serif;
+    font-size: 3.5rem;
+    margin-bottom: 0.5em;
+    text-align: center;
+    font-weight: 500;
+}
+
+.form__text {
+    font-family: "Open Sans", sans-serif;
+    font-size: 2.2rem;
+    margin-bottom: 1em;
+}
+
+.form__text--centered {
+    text-align: center;
+}
+
+.form__group {
+    margin-bottom: 1.5em;
+}
+
+.form__label {
+    font-family: "Open Sans", sans-serif;
+    display: block;
+    font-size: 2.4rem;
+    font-weight: 500;
+    margin-bottom: 0.5em;
+}
+
+.form__input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.5em;
+    font-size: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form__checkbox-row {
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    margin-top: 5px;
+}
+
+.form__checkbox {
+    width: 20px;
+    height: 20px;
+}
+
+.form__text--small {
+    font-size: 2rem;
+    margin: 0 5px;
+}
+
+a.form__text--link {
+    text-decoration: none;
+    color: #7091E6;
+    font-weight: 550;
+}
+
+a.form__text--link:hover {
+    text-decoration: underline;
+}
+
+.form__submit-button {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+}

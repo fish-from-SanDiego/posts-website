@@ -1,17 +1,14 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
-  Render,
-  Query,
-  Patch,
-  Body,
-  Res,
   ParseIntPipe,
-  UseGuards,
+  Patch,
+  Render,
+  Res,
   UseFilters,
-  UnauthorizedException,
-  BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { Head } from '../templateModels/head.interface';
@@ -30,43 +27,25 @@ import {
 import { Session } from '../auth/session/session.decorator';
 import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
 import { SupertokensHtmlExceptionFilter } from '../auth/auth.filter';
-import { RolesGuard } from '../auth/supertokens/roles.guard';
-import { SessionRequest } from 'supertokens-node/framework/express';
 import { UserService } from '../user/user.service';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { UserProfileDto } from './response/user-profile.dto';
+import { UserProfileHook } from './premissions/user-profile.hook';
 
 @ApiExcludeController(true)
 @Controller('users')
 @UseFilters(SupertokensHtmlExceptionFilter)
-@UseGuards(new SuperTokensAuthGuard(), RolesGuard)
+@UseGuards(new SuperTokensAuthGuard())
 export class UserProfileController {
   constructor(
     private readonly userProfileService: UserProfileService,
     private readonly userService: UserService,
   ) {}
 
-  async getUser(req: SessionRequest) {
-    const id = req.session?.getUserId();
-    if (id == null) throw new UnauthorizedException();
-    return await this.userService.getUserBySupertokensId(id);
-  }
-
-  private getUserIdParam(req: SessionRequest) {
-    try {
-      return parseInt(req.params['userId']);
-    } catch (e) {
-      throw new BadRequestException(
-        'Validation failed (numeric string is expected)',
-      );
-    }
-  }
-
-  @Get(':userId')
+  @Get(':id')
   @Render('user/profile/info')
   @PublicAccess()
-  async getUserProfile(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async getUserProfile(@Param('id', ParseIntPipe) userId: number) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
@@ -92,7 +71,6 @@ export class UserProfileController {
       currentPageSection: 'Профиль',
     };
     return Object.assign(
-      { ...res.locals },
       {
         layout: 'main',
       },
@@ -106,17 +84,17 @@ export class UserProfileController {
         profileImageUrl: user.pictureUrl,
         status: userProfile.status,
         bio: userProfile.bio,
+        userId: user.id,
       },
     );
   }
 
-  @Get(':userId/edit')
+  @Get(':id/edit')
   @Render('user/profile/edit')
-  @VerifySession()
-  async editInfoPage(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Session() session: SessionContainerInterface,
-  ) {
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.update, UserProfileDto, UserProfileHook)
+  async editInfoPage(@Param('id', ParseIntPipe) userId: number) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
@@ -155,9 +133,12 @@ export class UserProfileController {
     );
   }
 
-  @Patch(':userId')
+  @Patch(':id')
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.update, UserProfileDto, UserProfileHook)
   async update(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseIntPipe) userId: number,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
     @Res() res: Response,
   ) {
@@ -169,7 +150,6 @@ export class UserProfileController {
       {
         bio: updateUserProfileDto.bio,
         status: updateUserProfileDto.status,
-        // pictureUrl:updateUserProfileDto.pictureUrl,
       },
       {},
     );

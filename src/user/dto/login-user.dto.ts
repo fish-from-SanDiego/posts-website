@@ -5,13 +5,12 @@ import { Type } from 'class-transformer';
 export class LoginUserDto {
   @ApiProperty({
     example: 'user@example.com',
-    description: 'Email пользователя',
+    description: 'Email или username пользователя',
     type: 'string',
   })
   @IsString()
   @Type(() => String)
-  @IsEmail({}, { message: 'Некорректный формат email' })
-  email: string;
+  emailOrUsername: string;
 
   @ApiProperty({
     example: '123Pas456wo@rdDD56',

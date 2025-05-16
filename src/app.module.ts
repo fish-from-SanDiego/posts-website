@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -14,8 +14,12 @@ import appConfig from './config/app.config';
 import { ConfigNamespaces } from './config/config.namespaces';
 import { AppConfig } from './config/app.config.type';
 import { getSuperTokensConfig } from './auth/auth.config';
-import { CaslModule } from './casl/casl.module';
 import adminConfig from './config/admin.config';
+import { CaslModule } from 'nest-casl';
+import { AuthUser, Role } from './auth/supertokens/roles.dto';
+import { CurrentUserRequest } from './auth/session/session.payload.middleware';
+import { CacheModule } from '@nestjs/cache-manager';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -39,6 +43,23 @@ import adminConfig from './config/admin.config';
       },
       imports: [],
     }),
+    CaslModule.forRoot<Role, AuthUser, CurrentUserRequest>({
+      superuserRole: Role.Admin,
+      getUserFromRequest: (request) => {
+        const payload = request.session!.getAccessTokenPayload();
+        const roles: string[] = payload['st-role'].v;
+        return {
+          id: +payload.userId,
+          roles: roles.filter((str): str is Role =>
+            Object.values(Role).includes(str as Role),
+          ),
+        };
+      },
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 10000,
+    }),
     PrismaModule,
     UserModule,
     PostModule,
@@ -47,7 +68,7 @@ import adminConfig from './config/admin.config';
     CommentModule,
     LikeModule,
     AuthModule,
-    CaslModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

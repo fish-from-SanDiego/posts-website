@@ -59,7 +59,6 @@
 
 .post__username--deleted {
     color: gray;
-    font-style: italic;
 }
 
 .post__dates, .comment__dates {
@@ -100,6 +99,14 @@
     white-space: nowrap;
 }
 
+.form__input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.5em;
+    font-size: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
 
 .post__content {
     margin-top: 1rem;
@@ -153,7 +160,7 @@
     flex-grow: 1;
     gap: 5px;
     justify-items: start;
-    align-content: start;
+    align-items: start;
 }
 
 .comments__column {

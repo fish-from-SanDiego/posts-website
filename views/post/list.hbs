@@ -1,5 +1,17 @@
 <div class="main__content base-layout">
-  <h1 class="posts__header">Посты</h1>
+  <div style="display: flex;flex-direction: row;align-items: end">
+    <h1 class="posts__header">
+      Посты
+    </h1>
+    {{#if currentUser}}
+      <button onclick="window.location.href=`/posts/new`"
+              class="default-button default-button--fit default-button--rounded "
+      style="margin-left: 5px">
+        +
+      </button>
+    {{/if}}
+  </div>
+
 
   <ul class="posts__list">
     {{#each posts}}
@@ -11,7 +23,7 @@
           {{else}}
             <span class="posts__author">Автор удалён</span>
           {{/if}}
-          
+
         </a>
       </li>
     {{/each}}

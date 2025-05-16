@@ -24,9 +24,11 @@ export function createCommentElement(comment) {
     : '';
   if (!comment.author?.pictureUrl)
     profilePic.style.backgroundColor = 'darkgray';
-  profilePic.style.width = '50px';
-  profilePic.style.height = '50px';
+  profilePic.style.width = '60px';
+  profilePic.style.height = '60px';
   profilePic.style.borderRadius = '50%';
+  profilePic.style.backgroundSize = 'contain';
+
 
   const username = document.createElement('a');
   username.classList.add('comments_comment-author');
@@ -40,7 +42,7 @@ export function createCommentElement(comment) {
   const createdAt = document.createElement('span');
   createdAt.classList.add('comment__dates');
   createdAt.textContent = formatDateTime(comment.createdAt);
-  
+
   const text = document.createElement('pre');
   text.classList.add('comments_comment-body');
   text.textContent = comment.content;
@@ -54,8 +56,13 @@ export function createCommentElement(comment) {
   commentElement.appendChild(userInfo);
   commentElement.appendChild(text);
   // commentElement.appendChild(createdAt);
-
-  if (comment.author != null && comment.author.id === loggedId) {
+  const rolesSet = window.modelData.rolesSet ?? new Set();
+  if (
+    (comment.author != null &&
+      comment.author.id === window.modelData.currentUser?.id) ||
+    rolesSet.has('admin') ||
+    rolesSet.has('moderator')
+  ) {
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Удалить';
     delBtn.classList.add('comments__delete_button');

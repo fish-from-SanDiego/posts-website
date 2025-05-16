@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { conflict, notFound } from './exceptions';
+import { UpdateUserProfileRawDto } from './dto/update-user-profile.raw.dto';
+import { UserProfileDto } from './response/user-profile.dto';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class UserProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly storageService: StorageService,
+  ) {}
 
   async profile(
     where: Prisma.UserProfileWhereUniqueInput,
@@ -22,9 +27,22 @@ export class UserProfileService {
     }
   }
 
+  async getProfileByUserId(userId: number) {
+    try {
+      const profile = await this.prisma.userProfile.findUnique({
+        where: { userId: userId },
+        include: { user: true },
+      });
+      if (profile == null) throw notFound();
+      return profile;
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
   async updateProfile(
     where: Prisma.UserProfileWhereUniqueInput,
-    data: UpdateUserProfileDto,
+    data: UpdateUserProfileRawDto,
     include: Prisma.UserProfileInclude,
   ) {
     try {
@@ -46,6 +64,23 @@ export class UserProfileService {
     } catch (e) {
       throw this.handleError(e);
     }
+  }
+
+  async updatePicture(userProfile: UserProfileDto, file: Express.Multer.File) {
+    const subPath = this.storageService.getUserPictureSubPath(
+      userProfile.userId,
+    );
+    const newUrl = await this.storageService.uploadFile(file, subPath);
+    await this.updateProfile(
+      {
+        userId: userProfile.userId,
+      },
+      {
+        pictureUrl: newUrl,
+      },
+      {},
+    );
+    return newUrl;
   }
 
   private handleError(e): any {

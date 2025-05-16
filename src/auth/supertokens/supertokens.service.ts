@@ -3,20 +3,22 @@
 import {
   Inject,
   Injectable,
-  OnApplicationBootstrap,
+  InternalServerErrorException,
+  NotFoundException,
   OnModuleInit,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   AuthModuleConfig,
   SupertokensConfigInjectionToken,
 } from '../auth.config.type';
-import supertokens, { RecipeUserId } from 'supertokens-node';
+import supertokens, { RecipeUserId, User as STUser } from 'supertokens-node';
 import UserRoles from 'supertokens-node/recipe/userroles';
 import { Role } from './roles.dto';
 import EmailPassword from 'supertokens-node/recipe/emailpassword';
 import Dashboard from 'supertokens-node/recipe/dashboard';
 import Session from 'supertokens-node/recipe/session';
-import { User as STUser } from 'supertokens-node';
+import { notFound } from '../../user/exceptions';
 
 @Injectable()
 export class SupertokensService implements OnModuleInit {
@@ -112,5 +114,12 @@ export class SupertokensService implements OnModuleInit {
 
   async revokeSession(handle: string) {
     return Session.revokeSession(handle);
+  }
+
+  async getEmailByStId(stId: string): Promise<string> {
+    const user = await supertokens.getUser(stId);
+    if (user == null)
+      throw new NotFoundException('Нет пользователя с таким Id');
+    return user.emails[0];
   }
 }

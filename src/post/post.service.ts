@@ -1,13 +1,9 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Post, Prisma } from '@prisma/client';
-import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { conflict, notFound } from './exceptions';
+import { CreatePostRawDto } from './dto/create-post.raw.dto';
 
 @Injectable()
 export class PostService {
@@ -36,8 +32,19 @@ export class PostService {
     }
   }
 
-  async postsPaged(pageN: number) {
+  async postsPaged(pageN: number, categoryName?: string) {
     try {
+      const searchCategory = categoryName
+        ? {
+            categories: {
+              some: {
+                category: {
+                  name: categoryName,
+                },
+              },
+            },
+          }
+        : {};
       return await this.prisma.$transaction(async (tx) => {
         const postsCount = await tx.post.count();
         const skippedPagesN =
@@ -51,6 +58,7 @@ export class PostService {
             orderBy: {
               id: 'desc',
             },
+            where: { ...searchCategory },
             include: {
               author: true,
             },
@@ -95,8 +103,6 @@ export class PostService {
       }),
       this.prisma.post.count({ where }),
     ]);
-    console.log(posts);
-    console.log(total);
     return { posts, total };
   }
 
@@ -114,6 +120,16 @@ export class PostService {
         where: where,
         include: include,
       });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async getPost(where: Prisma.PostWhereUniqueInput) {
+    try {
+      const post = await this.post(where);
+      if (post == null) throw notFound();
+      return post;
     } catch (e) {
       throw this.handleError(e);
     }
@@ -138,7 +154,7 @@ export class PostService {
     }
   }
 
-  async createPost(data: CreatePostDto) {
+  async createPost(data: CreatePostRawDto) {
     try {
       return await this.prisma.post.create({
         data: {
@@ -148,7 +164,7 @@ export class PostService {
             connect: { id: +data.authorId },
           },
           categories: {
-            create: data.categoryNames.map((cat) => ({
+            create: (data.categoryNames ?? []).map((cat) => ({
               category: {
                 connectOrCreate: {
                   where: { name: cat },
@@ -164,6 +180,7 @@ export class PostService {
               category: true,
             },
           },
+          author: true,
         },
       });
     } catch (e) {
@@ -175,14 +192,31 @@ export class PostService {
     where: Prisma.PostWhereUniqueInput;
     data: UpdatePostDto;
   }) {
+    const { data, where } = params;
+
+    const { categoryNames, ...rest } = data;
+
     try {
-      const { data, where } = params;
       return await this.prisma.post.update({
+        where,
         data: {
-          title: data.title,
-          content: data.content,
+          ...rest,
+          ...(categoryNames
+            ? {
+                categories: {
+                  deleteMany: {}, // удаляет все старые связи
+                  create: categoryNames.map((name) => ({
+                    category: {
+                      connectOrCreate: {
+                        where: { name },
+                        create: { name },
+                      },
+                    },
+                  })),
+                },
+              }
+            : {}),
         },
-        where: where,
       });
     } catch (e) {
       throw this.handleError(e);

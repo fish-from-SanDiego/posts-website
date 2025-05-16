@@ -1,9 +1,4 @@
-import { TypeInput } from 'supertokens-node/types';
 import { AppConfig } from '../config/app.config.type';
-import EmailPassword from 'supertokens-node/recipe/emailpassword';
-import Session from 'supertokens-node/recipe/session';
-import UserRoles from 'supertokens-node/recipe/userroles';
-import Dashboard from 'supertokens-node/recipe/dashboard';
 import { AuthModuleConfig } from './auth.config.type';
 
 // import ThirdParty from 'supertokens-node/recipe/thirdparty';

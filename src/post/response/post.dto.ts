@@ -7,7 +7,7 @@ export class PostDto {
   id: number;
 
   @ApiProperty({ example: 1, description: 'ID автора' })
-  authorId?: number;
+  authorId: number | null;
 
   @ApiProperty({ example: 'Пост', description: 'Заголовок поста' })
   title: string;
@@ -18,11 +18,11 @@ export class PostDto {
   })
   content: string;
 
-  @ApiProperty({
-    example: '1',
-    description: 'Число лайков',
-  })
-  likesCount: number;
+  // @ApiProperty({
+  //   example: '1',
+  //   description: 'Число лайков',
+  // })
+  // likesCount: number;
 
   @ApiProperty({
     example: '2025-04-25T23:08:23.000Z',
@@ -34,10 +34,10 @@ export class PostDto {
     example: '2025-04-25T23:12:25.000Z',
     description: 'Дата обновления поста',
   })
-  updatedAt?: Date;
+  updatedAt: Date | null;
 
-  @ApiProperty()
-  author?: UserDto;
+  @ApiProperty({ type: UserDto })
+  author: UserDto | null;
 
   @ApiProperty({ type: PostsCategoriesDto, isArray: true })
   categories: PostsCategoriesDto[];

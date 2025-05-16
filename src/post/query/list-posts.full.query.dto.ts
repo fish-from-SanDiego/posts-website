@@ -1,5 +1,12 @@
-import { ArrayMinSize, IsArray, IsInt, IsOptional, IsString, Min } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ListPostsFullQueryDto {

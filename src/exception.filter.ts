@@ -18,9 +18,8 @@ export class GlobalFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
 
-    const accept = request.headers['accept'];
-
-    const isHtml = accept && accept.includes('text/html');
+    const isHtml = !request.path.startsWith('/api');
+    console.log(isHtml);
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -50,18 +49,18 @@ export class GlobalFilter implements ExceptionFilter {
       };
       const model = Object.assign(
         { layout: 'main' },
-        { ...defaultHeader, userLoggedIn: false },
+        { ...defaultHeader },
         defaultFooter,
         headInfo,
         {
-          errorMessage: message,
+          errorMessage: exception.response?.message ?? message,
         },
       );
       response.status(status).render('error', model);
     } else {
       response.status(status).json({
         statusCode: status,
-        message: message,
+        message: exception.response?.message ?? message,
         timestamp: new Date().toISOString(),
       });
     }

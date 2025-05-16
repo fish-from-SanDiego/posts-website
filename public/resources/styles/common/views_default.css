@@ -181,13 +181,6 @@
     }
 }
 
-/*.base-layout__item {*/
-/*    padding: 10px 20px;*/
-/*    box-sizing: border-box;*/
-/*    font-family: "Open Sans", sans-serif;*/
-/*    flex: 1 0;*/
-/*}*/
-
 /*.about__title {*/
 /*    font-size: 3rem;*/
 /*    margin: 0.67em 0;*/
@@ -256,4 +249,71 @@
     user-select: none;
     width: 5rem;
     height: 5rem;
+}
+
+.default-button {
+    font-family: "Open Sans", sans-serif;
+    padding: 10px;
+    font-size: 2.4rem;
+    font-weight: 550;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: none;
+}
+
+label.default-button {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+.default-button--small {
+    font-size: 2rem;
+}
+
+.default-button {
+    background: #3A3F4A;
+    color: #FFFFFF;
+}
+
+.default-button:hover {
+    background: #505763;
+}
+
+.default-button--save {
+    background: #28A745;
+    color: #fff;
+}
+
+.default-button--save:hover {
+    background: #34D058;
+}
+
+.default-button--edit {
+    background: #28A745;
+    color: #fff;
+}
+
+.default-button--edit:hover {
+    background: #1fb144;
+}
+
+.default-button--delete {
+    background: #DC3545;
+    color: #fff;
+}
+
+.default-button--delete:hover {
+    background: #E55361;
+}
+
+.default-button--hidden {
+    display: none;
+}
+
+.default-button--fit {
+    width: fit-content;
+}
+
+.default-button--rounded {
+    border-radius: 5px;
 }

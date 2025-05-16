@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdatePostDto {
@@ -16,6 +22,7 @@ export class UpdatePostDto {
   @MinLength(5)
   @MaxLength(100)
   title?: string;
+
   @ApiProperty({
     example: 'Контент поста',
     minLength: 5,
@@ -29,4 +36,19 @@ export class UpdatePostDto {
   @MinLength(5)
   @MaxLength(20000)
   content?: string;
+
+  @ApiProperty({
+    example: ['Коты', 'Ещё что-нибудь'],
+    description: 'Название категории поста',
+    minLength: 2,
+    maxLength: 15,
+    type: 'string',
+    required: false,
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MinLength(2, { each: true })
+  @MaxLength(15, { each: true })
+  categoryNames?: string[];
 }

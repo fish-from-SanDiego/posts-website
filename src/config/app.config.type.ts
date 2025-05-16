@@ -3,4 +3,7 @@
   port: number;
   superTokensConnectionUrl: string;
   superTokensApiKey: string;
+  storageBucket: string;
+  storageAccessKey: string;
+  storageSecretKey: string;
 };

@@ -1,4 +1,4 @@
-import { AppInfo, RecipeListFunction } from 'supertokens-node/types';
+import { AppInfo } from 'supertokens-node/types';
 
 export const SupertokensConfigInjectionToken =
   'SupertokensConfigInjectionToken';

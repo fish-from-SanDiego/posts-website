@@ -1,8 +1,6 @@
 import {
-  ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCookieAuth,
-  ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -30,6 +28,7 @@ import {
 } from 'supertokens-nestjs';
 import { Session } from '../auth/session/session.decorator';
 import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
+import { Role } from '../auth/supertokens/roles.dto';
 
 @ApiTags('user-session')
 @Controller('api/users')
@@ -50,14 +49,24 @@ export class UserSessionApiController {
     description: 'Успешный логин',
     type: UserDto,
   })
-  @ApiUnauthorizedResponse({ description: 'Неправильные данные' })
+  @ApiUnauthorizedResponse({ description: 'Неверные данные' })
   async login(
     @Body() data: LoginUserDto,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<UserDto> {
+    let email: string;
+    const userByUsername = await this.userService.findUserByUsername(
+      data.emailOrUsername,
+      { omit: { supertokensId: false } },
+    );
+    if (userByUsername != null) {
+      email = await this.stService.getEmailByStId(userByUsername.supertokensId);
+    } else {
+      email = data.emailOrUsername;
+    }
     const [user, stUser] = await this.userService.loginUser(
-      data.email,
+      email,
       data.password,
     );
     await this.stService.createSession(req, res, stUser, {
@@ -84,7 +93,11 @@ export class UserSessionApiController {
   })
   @ApiConflictResponse({ description: 'Логин или почта уже существуют' })
   async register(@Body() data: CreateUserDto): Promise<UserDto> {
-    const [user, stUser] = await this.userService.createUser(data, {});
+    const [user, stUser] = await this.userService.createUser(
+      data,
+      {},
+      Role.User,
+    );
     return {
       id: user.id,
       username: user.username,

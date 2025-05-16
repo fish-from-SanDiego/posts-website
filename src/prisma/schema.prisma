@@ -14,16 +14,16 @@ datasource db {
 }
 
 model Post {
-  id         Int       @id @default(autoincrement())
-  author     User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  title      String
-  content    String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
-  likesCount Int       @default(0)
+  id        Int       @id @default(autoincrement())
+  author    User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  title     String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  // likesCount Int       @default(0)
 
   categories CategoriesOnPosts[]
-  likes      Like[]
+  // likes      Like[]
   comments   Comment[]
 
   authorId Int?
@@ -35,7 +35,7 @@ model User {
   supertokensId String       @unique
   pictureUrl    String?
   posts         Post[]
-  likes         Like[]
+  // likes         Like[]
   comments      Comment[]
   profile       UserProfile?
 }
@@ -48,19 +48,19 @@ model UserProfile {
   userId Int     @unique
 }
 
-model Like {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  userId Int
-  postId Int
-
-  // index is created automatically
-  @@unique([userId, postId])
-}
+// model Like {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//
+//   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+//
+//   userId Int
+//   postId Int
+//
+//   // index is created automatically
+//   @@unique([userId, postId])
+// }
 
 model Category {
   id   Int    @id @default(autoincrement())

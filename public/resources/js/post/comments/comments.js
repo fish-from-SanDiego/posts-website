@@ -108,7 +108,7 @@ document
   ?.addEventListener('submit', async function (event) {
     event.preventDefault();
 
-    const authorId = loggedId;
+    const authorId = window.modelData.currentUser.id;
     const content = document.getElementById('comment-content').value;
 
     const data = {

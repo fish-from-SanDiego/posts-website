@@ -4,9 +4,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmptyTrimmed } from '../../decorators/is-not-empty-trimmed.decorator';
 
 export class CreateCommentDto {
-  @ApiProperty({
-    example: 1,
-  })
+  // @ApiProperty({
+  //   example: 1,
+  // })
   @IsNotEmptyTrimmed()
   @Type(() => String)
   @IsString()
@@ -16,9 +16,4 @@ export class CreateCommentDto {
   @Type(() => Number)
   @IsPositive()
   postId: number;
-
-  @IsInt()
-  @Type(() => Number)
-  @IsPositive()
-  authorId: number;
 }

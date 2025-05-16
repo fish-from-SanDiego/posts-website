@@ -21,7 +21,5 @@ export default <Header>{
     { url: '/some-post', text: 'Пост (static)' },
     { url: '/api/docs', text: 'Swagger тут' },
   ],
-  userLoggedIn: false,
-  loggedUser: { profileLink: '.', username: 'Username' },
-  loginLink: '/users/add',
+  loginLink: '/login',
 };

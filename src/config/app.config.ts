@@ -9,5 +9,8 @@ export default registerAs<AppConfig>('app', () => {
     superTokensConnectionUrl:
       process.env.SUPERTOKENS_CONNECTION_URL?.toString() ?? '',
     superTokensApiKey: process.env.SUPERTOKENS_API_KEY ?? '',
+    storageBucket: process.env.STORAGE_BUCKET ?? '',
+    storageAccessKey: process.env.STORAGE_ACCESS_KEY ?? '',
+    storageSecretKey: process.env.STORAGE_SECRET_KEY ?? '',
   };
 });

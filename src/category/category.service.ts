@@ -48,6 +48,18 @@ export class CategoryService {
     }
   }
 
+  async getCategory(id: number) {
+    try {
+      const cat = await this.prisma.category.findUnique({
+        where: { id },
+      });
+      if (cat == null) throw notFound();
+      return cat;
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
     try {
       return await this.prisma.category.update({

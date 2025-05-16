@@ -3,6 +3,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   OnModuleInit,
@@ -19,7 +20,10 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigNamespaces } from '../config/config.namespaces';
 import { AdminConfig } from '../config/admin.config.type';
 import { Role } from '../auth/supertokens/roles.dto';
-import { RecipeUserId, User as STUser } from 'supertokens-node';
+import supertokens, { RecipeUserId, User as STUser } from 'supertokens-node';
+import { UserDto } from './dto/user.dto';
+import UserRoles from 'supertokens-node/recipe/userroles';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -27,6 +31,7 @@ export class UserService implements OnModuleInit {
     private prisma: PrismaService,
     private configService: ConfigService<ConfigNamespaces>,
     private stService: SupertokensService,
+    private readonly storageService: StorageService,
   ) {}
 
   async onModuleInit() {
@@ -53,6 +58,7 @@ export class UserService implements OnModuleInit {
   async createUser(
     data: CreateUserDto,
     include: Prisma.UserInclude,
+    role?: Role,
   ): Promise<[User, { user: STUser; recipeUserId: RecipeUserId }]> {
     try {
       return await this.prisma.$transaction(async (tx) => {
@@ -71,13 +77,14 @@ export class UserService implements OnModuleInit {
         } else if (signUpResult.status !== 'OK') {
           throw new InternalServerErrorException();
         }
-        const rolesResult = await this.stService.assignRole(
-          signUpResult.user.id,
-          Role.User,
-        );
-        if (rolesResult.status === 'UNKNOWN_ROLE_ERROR')
-          throw new InternalServerErrorException();
-
+        if (role) {
+          const rolesResult = await this.stService.assignRole(
+            signUpResult.user.id,
+            Role.User,
+          );
+          if (rolesResult.status === 'UNKNOWN_ROLE_ERROR')
+            throw new InternalServerErrorException();
+        }
         return [
           await tx.user.create({
             data: {
@@ -106,6 +113,70 @@ export class UserService implements OnModuleInit {
         where: userWhereUniqueInput,
         include: include,
       });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async findUserByUsername(
+    username: string,
+    options?: { include?: Prisma.UserInclude; omit?: Prisma.UserOmit },
+  ) {
+    try {
+      return await this.prisma.user.findUnique({
+        where: { username: username },
+        include: options?.include ?? {},
+        omit: options?.omit ?? {},
+      });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async getUserById(id: number, options?: { include?: Prisma.UserInclude }) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: id },
+        include: options?.include ?? {},
+      });
+      if (user == null) throw notFound();
+      return user;
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async getUserRolesById(userId: number) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: +userId },
+        omit: { supertokensId: false },
+      });
+      if (user == null) throw notFound();
+      const stId = user.supertokensId;
+      return (await UserRoles.getRolesForUser('public', stId)).roles;
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async updateUserRolesById(userId: number, roles: Role[]) {
+    const rolesSet = new Set(roles);
+    if (rolesSet.has(Role.Admin)) throw new ForbiddenException();
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: +userId },
+        omit: { supertokensId: false },
+      });
+      if (user == null) throw notFound();
+      const stId = user.supertokensId;
+      for (const role of (await UserRoles.getRolesForUser('public', stId))
+        .roles) {
+        await UserRoles.removeUserRole('public', stId, role);
+      }
+      for (const role of rolesSet) {
+        await this.stService.assignRole(stId, role);
+      }
     } catch (e) {
       throw this.handleError(e);
     }
@@ -160,7 +231,7 @@ export class UserService implements OnModuleInit {
     try {
       const result = await this.stService.signInEmail(email, password);
       if (result.status === 'WRONG_CREDENTIALS_ERROR') {
-        throw new UnauthorizedException('Wrong credentials');
+        throw new UnauthorizedException('Неверные данные');
       } else if (result.status !== 'OK') {
         throw new InternalServerErrorException();
       }
@@ -193,8 +264,23 @@ export class UserService implements OnModuleInit {
   async removeUser(
     where: Prisma.UserWhereUniqueInput,
     include: Prisma.UserInclude,
-  ): Promise<Omit<User, 'supertokensId'>> {
+  ) {
     try {
+      const user = await this.prisma.user.findUnique({
+        where: where,
+        include: include,
+        omit: { supertokensId: false },
+      });
+      if (!user) throw notFound();
+      const removeResult = await this.stService.deleteAccountById(
+        user.supertokensId,
+      );
+      if (removeResult.status !== 'OK')
+        throw new InternalServerErrorException();
+      if (user.pictureUrl != null) {
+        const subPath = this.storageService.getSubPath(user.pictureUrl);
+        await this.storageService.deleteFile(subPath);
+      }
       return await this.prisma.user.delete({
         where: where,
         include: include,

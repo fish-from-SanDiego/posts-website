@@ -1,18 +1,17 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
-  NotFoundException,
-  Render,
-  Query,
-  Res,
   ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+  Render,
+  Res,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Prisma } from '@prisma/client';
@@ -22,7 +21,7 @@ import defaultFooter from '../templateModels/footer.default';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Response } from 'express';
 import { notFound } from './exceptions';
-import { ListPostsQueryDto } from './dto/list-posts.query.dto';
+import { ListPostsQueryDto } from './query/list-posts.query.dto';
 import { ApiExcludeController } from '@nestjs/swagger';
 import {
   PublicAccess,
@@ -30,22 +29,26 @@ import {
   VerifySession,
 } from 'supertokens-nestjs';
 import { SupertokensHtmlExceptionFilter } from '../auth/auth.filter';
-import { Role } from '../auth/supertokens/roles.dto';
+import { Session } from '../auth/session/session.decorator';
+import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { PostDto } from './response/post.dto';
+import { PostHook } from './permissions/post.hook';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @ApiExcludeController(true)
 @Controller('posts')
 @UseFilters(SupertokensHtmlExceptionFilter)
 @UseGuards(new SuperTokensAuthGuard())
+@UseInterceptors(CacheInterceptor)
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
   @Render('post/list')
   @PublicAccess()
-  async listPosts(
-    @Query() query: ListPostsQueryDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async listPosts(@Query() query: ListPostsQueryDto) {
     const pageN = query.page ? query.page : 1;
     const posts = await this.postService.postsPaged(pageN);
     const pageNumber = posts.pageNumber;
@@ -59,7 +62,6 @@ export class PostController {
       currentPageSection: 'Посты',
     };
     return Object.assign(
-      { ...res.locals },
       { layout: 'main' },
       { ...defaultHeader },
       defaultFooter,
@@ -78,8 +80,10 @@ export class PostController {
 
   @Get('new')
   @Render('post/new')
-  goToPostCreation(@Query('loggedId', ParseIntPipe) loggedId: number) {
-    const authorId = loggedId;
+  @VerifySession()
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.create, PostDto)
+  goToPostCreation() {
     const headInfo: Head = {
       title: 'Создание поста',
       description: `Создание поста`,
@@ -94,18 +98,49 @@ export class PostController {
       { ...defaultHeader },
       defaultFooter,
       headInfo,
+    );
+  }
+
+  @Get(':id/edit')
+  @Render('post/edit')
+  @VerifySession()
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.update, PostDto, PostHook)
+  async goToPostEdition(@Param('id', ParseIntPipe) postId: number) {
+    const where: Prisma.PostWhereUniqueInput = {
+      id: postId,
+    };
+    const post = await this.postService.post(where);
+    if (post == null) throw notFound();
+    const headInfo: Head = {
+      title: `Редактирование поста \\ ${post.title}`,
+      description: `Редактирование поста`,
+      keywords: 'Пост',
+      specificScripts: [],
+      specificModuleScripts: [],
+      specificStylesheets: [`/resources/styles/post/edit.css`],
+      currentPageSection: 'Посты',
+    };
+    return Object.assign(
+      { layout: 'main' },
+      { ...defaultHeader },
+      defaultFooter,
+      headInfo,
       {
-        authorId: authorId,
+        post: {
+          id: post.id,
+          categories: post.categories.map((cat) => cat.category),
+          title: post.title,
+          content: post.content,
+        },
       },
     );
   }
 
-  @Get(':postId')
+  @Get(':id')
   @Render('post/info')
-  async getPost(
-    @Param('postId', ParseIntPipe) postId: number,
-    @Query('loggedId') loggedId?: number,
-  ) {
+  @PublicAccess()
+  async getPost(@Param('id', ParseIntPipe) postId: number) {
     const where: Prisma.PostWhereUniqueInput = {
       id: postId,
     };
@@ -144,16 +179,39 @@ export class PostController {
           title: post.title,
           content: post.content,
         },
-        loggedId: loggedId,
       },
     );
   }
 
   @Post()
-  async createPost(@Body() createPostDto: CreatePostDto, @Res() res: Response) {
-    const newPost = await this.postService.createPost(createPostDto);
-    return res.redirect(
-      `posts/${newPost.id}?loggedId=${createPostDto.authorId}`,
-    );
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.create, PostDto)
+  async createPost(
+    @Body() createPostDto: CreatePostDto,
+    @Res() res: Response,
+    @Session() session: SessionContainerInterface,
+  ) {
+    const newPost = await this.postService.createPost({
+      ...createPostDto,
+      authorId: session.getAccessTokenPayload().userId,
+    });
+    return res.redirect(`posts/${newPost.id}`);
+  }
+
+  @Patch(':id')
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.update, PostDto, PostHook)
+  async updatePost(
+    @Body() updatePostDto: UpdatePostDto,
+    @Res() res: Response,
+    @Param('id', ParseIntPipe) postId: number,
+  ) {
+    const updatedPost = await this.postService.updatePost({
+      data: updatePostDto,
+      where: { id: +postId },
+    });
+    return res.redirect(`posts/${updatedPost.id}`);
   }
 }
