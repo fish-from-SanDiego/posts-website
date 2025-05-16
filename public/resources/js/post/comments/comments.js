@@ -26,7 +26,6 @@ async function fetchInitialComments() {
   const res = await fetch(`/posts/${postId}/comments`);
   const json = await res.json();
   if (json.cursorValid) {
-
     if (json.data.length === 0) {
       moreBtn.classList.add('hidden');
     }
@@ -92,10 +91,10 @@ function setupSSE() {
     if (el) el.remove();
     commentMap.delete(eData.commentId);
   };
-  window.onbeforeunload += function () {
+  window.addEventListener('beforeunload', () => {
     newEvt.close();
     delEvt.close();
-  };
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -109,7 +108,7 @@ document
   ?.addEventListener('submit', async function (event) {
     event.preventDefault();
 
-    const authorId = loggedId;
+    const authorId = window.modelData.currentUser.id;
     const content = document.getElementById('comment-content').value;
 
     const data = {
@@ -149,4 +148,7 @@ document.addEventListener('DOMContentLoaded', function () {
   toggleButtonState();
 
   textarea.addEventListener('input', toggleButtonState);
+  document
+    .getElementById('submit-comment')
+    ?.addEventListener('click', toggleButtonState);
 });

@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 
 export class UserIdParam {
   @ApiProperty({
-    example: 4444,
+    example: 1,
     description: 'id пользователя',
     minimum: 1,
     type: 'number',

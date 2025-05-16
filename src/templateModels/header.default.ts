@@ -19,8 +19,7 @@ export default <Header>{
     { url: '/table', text: 'Таблица' },
     { url: '/loan-calc', text: 'Расчёт платежей' },
     { url: '/some-post', text: 'Пост (static)' },
+    { url: '/api/docs', text: 'Swagger тут' },
   ],
-  userLoggedIn: false,
-  loggedUser: { profileLink: '.', username: 'Username' },
-  loginLink: '/users/add',
+  loginLink: '/login',
 };

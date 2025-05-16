@@ -23,11 +23,80 @@
         {{/if}}
       </div>
     </div>
+    <div style="display: flex;flex-direction: row;gap: 5px">
 
-    {{#if loggedId}}
-      <a href="/users/{{loggedId}}/edit" class="edit-button">Редактировать профиль</a>
-    {{/if}}
+      <button id="edit-profile-button" onclick="{window.location.href=`/users/${window.modelData.userId}/edit`}"
+              class="default-button default-button--edit default-button--fit hidden">Редактировать профиль
+      </button>
+
+      <button id="picture-upload-button" class="default-button default-button--edit default-button--fit hidden">
+
+        <label id="picture-upload-label" for="picture-upload">
+          Изменить фото профиля
+        </label>
+        <input id="picture-upload" type="file" class="hidden" accept="image/*" />
+      </button>
+      <button id="logout-button"
+              class="default-button default-button--delete default-button--fit hidden"> Выйти из аккаунта
+      </button>
+    </div>
 
 
   </div>
 </div>
+<script>
+  if (window.modelData.currentUser != null && (window.modelData.userId === window.modelData.currentUser.id)) {
+    document.getElementById('edit-profile-button').classList.remove('hidden');
+    document.getElementById('logout-button').classList.remove('hidden');
+    document.getElementById('picture-upload-button').classList.remove('hidden');
+    document.getElementById('logout-button').addEventListener('click', () => {
+      fetch(`/api/users/logout`, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            const data = await response.json();
+            window.alert(
+              `Ошибка: ${Array.isArray(data.message) ? data.message.join('\n') : data.message}`,
+            );
+          } else {
+            window.location.href = `/`;
+          }
+        })
+        .catch((error) => {
+          window.alert(`Ошибка: ${error.message}`);
+        });
+    });
+    document.getElementById('picture-upload').addEventListener('change', function(event) {
+      // const file = event.target.files[0];
+      const file = event.target.files[0];
+      if (file == null) return;
+      let formData = new FormData();
+      formData.append('file', file);
+      fetch(`/api/users/${window.modelData.currentUser.id}/profile/picture`, {
+        method: 'PATCH',
+        headers: {
+          accept: 'application/json',
+        },
+        body: formData,
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            const data = await response.json();
+            window.alert(
+              `Ошибка: ${Array.isArray(data.message) ? data.message.join('\n') : data.message}`,
+            );
+          } else {
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          window.alert(`Ошибка: ${error.message}`);
+        });
+    });
+  }
+</script>

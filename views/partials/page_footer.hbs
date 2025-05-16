@@ -5,6 +5,9 @@
         {{#each footerLinks}}
           <a class="{{../footerClasses.menuLink}}" href="{{this.url}}">{{this.text}}</a>
         {{/each}}
+        <a class="{{footerClasses.menuLink}}">
+          Запрос занял {{requestHandleTimeMs}} мс на обработку
+        </a>
       </div>
     </div>
   </div>

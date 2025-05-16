@@ -1,6 +1,12 @@
 <head>
   <script>
     window.modelData = {{{json this}}};
+    if (window.modelData == null) {
+      window.modelData = {};
+    }
+    if (window.modelData.currentUser) {
+      window.modelData.rolesSet = new Set(window.modelData.currentUser.roles);
+    }
     console.log(window.modelData);
     const currentPageSection = '{{currentPageSection}}';
   </script>

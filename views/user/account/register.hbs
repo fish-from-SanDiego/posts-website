@@ -1,0 +1,37 @@
+{{#if currentUser}}
+  <script>
+    window.location.href = "/users/{{currentUser.id}}";
+  </script>
+{{/if}}
+
+<div class="main__content base-layout">
+  <div class="vertical-container base-layout__item">
+    <form autocomplete="off" class="form" id="register-form">
+      <p class="form__title">Регистрация</p>
+      <p class="form__text form__text--centered">Уже зарегистрированы?
+        <a id="login-link"
+           href="/login" class="form__text--link">Войти</a></p>
+      <div class="form__group">
+        <label for="username" class="form__label">Придумайте username</label>
+        <input required class="form__input" type="text" id="username" name="username"
+               placeholder="Введите username..."></input>
+      </div>
+      <div class="form__group">
+        <label for="email" class="form__label">Укажите email</label>
+        <input required class="form__input" type="email" id="email" name="email"
+               placeholder="Введите email..."></input>
+      </div>
+      <div>
+        <label for="password" class="form__label">Придумайте пароль (>=8 знаков, хотя бы одна цифра, спецсимвол,
+          заглаваная и строчная буква)</label>
+        <input required class="form__input" type="password" id="password" name="password"
+               placeholder="Введите пароль..."></input>
+      </div>
+      <div class="form__group form__checkbox-row">
+        <input type="checkbox" class="form__checkbox" id="show-password">
+        <p class="form__text form__text--small">Показать пароль</p>
+      </div>
+      <button id="register-form-submit" type="submit" class="default-button form__submit-button">Отправить</button>
+    </form>
+  </div>
+</div>

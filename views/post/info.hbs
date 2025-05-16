@@ -31,18 +31,26 @@
       <div class="post__content">
         <p class="post__text">{{post.content}}</p>
       </div>
+      <div>
+        <button
+          onclick="{window.location.href=`/posts/${window.modelData.post.id}/edit`}"
+          id="edit-post-button"
+          class="default-button default-button--small default-button--edit default-button--fit hidden">
+          Редактировать
+        </button>
+        <button id="delete-post-button"
+                class="default-button default-button--small default-button--delete default-button--fit hidden">Удалить
+        </button>
+      </div>
     </div>
-    <!--    <spinning-loader loader-speed="0.65"-->
-    <!--                     class="vertical-container__item vertical-container__item--loader"-->
-    <!--                     id="post-comments-loader"></spinning-loader>-->
 
     <spinning-loader loader-speed="0.65"
                      class="vertical-container__item vertical-container__item--loader"
                      id="post-comments-loader"></spinning-loader>
 
-    {{#if loggedId}}
+    {{#if currentUser}}
       <form id="comments-form" class="comments-form hidden">
-        <textarea id="comment-content" class="comment-textarea" placeholder="Комментарий..."></textarea>
+        <textarea id="comment-content" class="form__input" placeholder="Комментарий..." style="resize: none"></textarea>
         <button id="submit-comment" class="comments-form__submit-button">Отправить</button>
       </form>
     {{/if}}
@@ -55,14 +63,42 @@
            class="warning__image">
       <span class="warning__text">Что-то пошло не так &mdash; комментарии не загрузились</span>
     </div>
-    <script>
-      let loggedId = null;
-    </script>
-    {{#if loggedId}}
-      <script>
-        loggedId = Number('{{loggedId}}');
-      </script>
-    {{/if}}
-    
+
   </div>
 </div>
+
+<script>
+  if (window.modelData.rolesSet.has('admin') || window.modelData.rolesSet.has('moderator') || (
+    window.modelData.currentUser != null && window.modelData.currentUser.id === window.modelData.author.id)
+  ) {
+    document.getElementById('delete-post-button').classList.remove('hidden');
+  }
+  if (window.modelData.rolesSet.has('admin') || (
+    window.modelData.currentUser != null && window.modelData.currentUser.id === window.modelData.author.id)
+  ) {
+    document.getElementById('edit-post-button').classList.remove('hidden');
+  }
+
+  document.getElementById('delete-post-button').addEventListener('click', (evt) => {
+    fetch(`/api/posts/${window.modelData.post.id}`, {
+      method: 'DELETE',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          window.alert(
+            `Ошибка: ${Array.isArray(data.message) ? data.message.join('\n') : data.message}`,
+          );
+        } else {
+          window.location.href = `/posts`;
+        }
+      })
+      .catch((error) => {
+        window.alert(`Ошибка: ${error.message}`);
+      });
+  });
+</script>

@@ -1,7 +1,6 @@
 <div class="main__content">
-  <h1 class="form__title vertical-container__item">Создать пост</h1>
-  <form action="/posts" method="POST" class="form vertical-container__item">
-    <input type="hidden" name="authorId" value="{{authorId}}">
+  <h1 class="form__title ">Создать пост</h1>
+  <form id="new-post-form" class="form vertical-container__item">
     <div class="form__group">
       <label for="title" class="form__label">Заголовок:</label>
       <input type="text" id="title" name="title" required class="form__input" />
@@ -15,34 +14,77 @@
     <div class="form__group">
       <label class="form__label">Категории:</label>
       <div id="category-container">
-        <div class="category-input">
-          <input type="text" name="categoryNames[]" class="form__input" placeholder="Введите категорию" required />
-          <button type="button" class="form__btn-remove" onclick="removeCategory(this)">−</button>
-        </div>
       </div>
       <button type="button" class="form__btn-add" onclick="addCategory()">+</button>
     </div>
 
     <div class="form__group">
-      <button type="submit" class="form__submit">Создать</button>
+      <button type="submit" class="default-button default-button--fit">Создать</button>
     </div>
   </form>
 
   <script>
+    const html = `
+    <div class="category-input">
+          <input type="text" name="categoryNames" class="form__input" placeholder="Введите категорию" required />
+          <button type="button" class="form__btn-remove" onclick="removeCategory(this)">−</button>
+        </div>
+`;
+
+    function getCategoryElement() {
+      const input = document.createElement('div');
+      input.innerHTML = html.trim();
+      return input;
+    }
+
     function addCategory() {
       const container = document.getElementById('category-container');
-      const firstInput = container.querySelector('.category-input');
-      const newInput = firstInput.cloneNode(true);
+      const newInput = getCategoryElement();
       newInput.querySelector('input').value = '';
       container.appendChild(newInput);
     }
 
     function removeCategory(button) {
       const container = document.getElementById('category-container');
-      const allInputs = container.querySelectorAll('.category-input');
-      if (allInputs.length > 1) {
-        button.parentElement.remove();
-      }
+      button.parentElement.remove();
     }
+
+    const newPostForm = document.getElementById('new-post-form');
+
+    newPostForm.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      const formData = new FormData(newPostForm);
+      const title = formData.get('title');
+      const content = formData.get('content');
+      const categoryNames = formData.getAll('categoryNames');
+      console.log(categoryNames);
+      const dto = {
+        title: title,
+        content: content,
+        categoryNames: categoryNames,
+      };
+      fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dto),
+      })
+        .then(async (response) => {
+          const data = await response.json();
+          if (!response.ok) {
+            window.alert(
+              `Ошибка: ${Array.isArray(data.message) ? data.message.join('\n') : data.message}`,
+            );
+          } else {
+            window.location.href = `/posts/${data.id}`;
+          }
+        })
+        .catch((error) => {
+          window.alert(`Ошибка: ${error.message}`);
+        });
+    });
+
   </script>
 </div>

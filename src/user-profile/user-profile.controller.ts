@@ -1,14 +1,14 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
-  Render,
-  NotFoundException,
-  Query,
-  Patch,
-  Body,
-  Res,
   ParseIntPipe,
+  Patch,
+  Render,
+  Res,
+  UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { Head } from '../templateModels/head.interface';
@@ -19,18 +19,33 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Response } from 'express';
 import { notFound } from './exceptions';
 import { ApiExcludeController } from '@nestjs/swagger';
+import {
+  PublicAccess,
+  SuperTokensAuthGuard,
+  VerifySession,
+} from 'supertokens-nestjs';
+import { Session } from '../auth/session/session.decorator';
+import { SessionContainerInterface } from 'supertokens-node/lib/build/recipe/session/types';
+import { SupertokensHtmlExceptionFilter } from '../auth/auth.filter';
+import { UserService } from '../user/user.service';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { UserProfileDto } from './response/user-profile.dto';
+import { UserProfileHook } from './premissions/user-profile.hook';
 
 @ApiExcludeController(true)
 @Controller('users')
+@UseFilters(SupertokensHtmlExceptionFilter)
+@UseGuards(new SuperTokensAuthGuard())
 export class UserProfileController {
-  constructor(private readonly userProfileService: UserProfileService) {}
+  constructor(
+    private readonly userProfileService: UserProfileService,
+    private readonly userService: UserService,
+  ) {}
 
-  @Get(':userId')
+  @Get(':id')
   @Render('user/profile/info')
-  async getUserProfile(
-    @Param('userId', ParseIntPipe) userId: number,
-    @Query('loggedId', new ParseIntPipe({ optional: true })) loggedId?: number,
-  ) {
+  @PublicAccess()
+  async getUserProfile(@Param('id', ParseIntPipe) userId: number) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
@@ -56,8 +71,12 @@ export class UserProfileController {
       currentPageSection: 'Профиль',
     };
     return Object.assign(
-      { layout: 'main' },
-      { ...defaultHeader },
+      {
+        layout: 'main',
+      },
+      {
+        ...defaultHeader,
+      },
       defaultFooter,
       headInfo,
       {
@@ -65,14 +84,17 @@ export class UserProfileController {
         profileImageUrl: user.pictureUrl,
         status: userProfile.status,
         bio: userProfile.bio,
-        loggedId: loggedId ? loggedId : undefined,
+        userId: user.id,
       },
     );
   }
 
-  @Get(':userId/edit')
+  @Get(':id/edit')
   @Render('user/profile/edit')
-  async editInfoPage(@Param('userId', ParseIntPipe) userId: number) {
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.update, UserProfileDto, UserProfileHook)
+  async editInfoPage(@Param('id', ParseIntPipe) userId: number) {
     const include: Prisma.UserProfileInclude = {
       user: true,
     };
@@ -111,9 +133,12 @@ export class UserProfileController {
     );
   }
 
-  @Patch(':userId')
+  @Patch(':id')
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.update, UserProfileDto, UserProfileHook)
   async update(
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('id', ParseIntPipe) userId: number,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
     @Res() res: Response,
   ) {
@@ -125,16 +150,9 @@ export class UserProfileController {
       {
         bio: updateUserProfileDto.bio,
         status: updateUserProfileDto.status,
-        // pictureUrl:updateUserProfileDto.pictureUrl,
       },
       {},
     );
     return res.redirect(`/users/${userId}`);
   }
-
-  //
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.userProfileService.remove(+id);
-  // }
 }

@@ -8,16 +8,20 @@ import {
   Post,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import {
   ApiBody,
   ApiConflictResponse,
+  ApiCookieAuth,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CategoryPageQuery } from './query/category.page.query';
@@ -26,13 +30,20 @@ import { CategoryDto } from './responseData/categoryDto';
 import { CategoryIdParam } from './query/category.id.param';
 import { notFound } from './exceptions';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import {
+  PublicAccess,
+  SuperTokensAuthGuard,
+  VerifySession,
+} from 'supertokens-nestjs';
+import { AccessGuard, Actions, UseAbility } from 'nest-casl';
+import { CategoryHook } from './permissions/category.hook';
 
 @ApiTags('categories')
 @Controller('api/categories')
+@UseGuards(new SuperTokensAuthGuard())
 export class CategoryApiController {
   constructor(private categoryService: CategoryService) {}
 
-  @Post()
   @ApiOperation({ summary: 'Создание категории' })
   @ApiBody({ type: CreateCategoryDto })
   @ApiResponse({
@@ -43,6 +54,13 @@ export class CategoryApiController {
   @ApiConflictResponse({
     description: 'Категория с таким именем уже существует',
   })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiCookieAuth()
+  @Post()
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.create, CategoryDto)
+  @VerifySession({ options: { checkDatabase: true } })
   createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
@@ -65,6 +83,7 @@ export class CategoryApiController {
       },
     },
   })
+  @PublicAccess()
   async findAll(@Query() query: CategoryPageQuery, @Res() res: Response) {
     const pageNumber = query.page;
 
@@ -96,6 +115,7 @@ export class CategoryApiController {
   }
 
   @Get(':id')
+  @PublicAccess()
   @ApiOperation({ summary: 'Получить категорию по id' })
   @ApiResponse({
     status: 200,
@@ -110,7 +130,7 @@ export class CategoryApiController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Обновление значение имени для категории' })
+  @ApiOperation({ summary: 'Обновление значения имени для категории' })
   @ApiBody({ type: UpdateCategoryDto })
   @ApiResponse({
     status: 200,
@@ -119,11 +139,17 @@ export class CategoryApiController {
   })
   @ApiConflictResponse({ description: 'Конфликт с существующим значением' })
   @ApiNotFoundResponse({ description: 'По id не найдено категории' })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiCookieAuth()
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.update, CategoryDto, CategoryHook)
   async update(
     @Param() param: CategoryIdParam,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoryService.update(param.id, updateCategoryDto);
+    return await this.categoryService.update(param.id, updateCategoryDto);
   }
 
   @Delete(':id')
@@ -134,6 +160,12 @@ export class CategoryApiController {
     type: CategoryDto,
   })
   @ApiNotFoundResponse({ description: 'Категория с таким id не найдена' })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiCookieAuth()
+  @VerifySession({ options: { checkDatabase: true } })
+  @UseGuards(AccessGuard)
+  @UseAbility(Actions.delete, CategoryDto, CategoryHook)
   async remove(@Param() param: CategoryIdParam) {
     return this.categoryService.remove(param.id);
   }

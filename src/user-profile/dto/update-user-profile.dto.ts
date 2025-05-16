@@ -27,14 +27,4 @@ export class UpdateUserProfileDto {
   @MinLength(1)
   @MaxLength(40)
   status?: string;
-
-  @ApiProperty({
-    example: '/users/2/pic.png',
-    required: false,
-    type: 'string',
-  })
-  @IsUrl()
-  @IsOptional()
-  @Type(() => String)
-  pictureUrl?: string;
 }

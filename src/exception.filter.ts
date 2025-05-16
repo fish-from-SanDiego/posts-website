@@ -1,8 +1,10 @@
-﻿import {
-  ExceptionFilter,
-  Catch,
+﻿/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import {
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Head } from './templateModels/head.interface';
@@ -11,20 +13,29 @@ import defaultFooter from './templateModels/footer.default';
 
 @Catch()
 export class GlobalFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
 
-    const accept = request.headers['accept'];
-
-    const isHtml = accept && accept.includes('text/html');
+    const isHtml = !request.path.startsWith('/api');
+    console.log(isHtml);
     const status =
-      exception instanceof HttpException ? exception.getStatus() : 500;
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : exception.type != null &&
+            (exception.type === 'UNAUTHORISED' ||
+              exception.type === 'TRY_REFRESH_TOKEN')
+          ? HttpStatus.UNAUTHORIZED
+          : HttpStatus.INTERNAL_SERVER_ERROR;
     const message =
       exception instanceof HttpException
         ? exception.message
-        : 'Internal server error';
+        : exception.type != null &&
+            (exception.type === 'UNAUTHORISED' ||
+              exception.type === 'TRY_REFRESH_TOKEN')
+          ? 'Unauthorized; try login'
+          : 'Internal Server Error';
     console.log(exception);
     if (isHtml) {
       const headInfo: Head = {
@@ -38,18 +49,19 @@ export class GlobalFilter implements ExceptionFilter {
       };
       const model = Object.assign(
         { layout: 'main' },
-        { ...defaultHeader, userLoggedIn: false },
+        { ...defaultHeader },
         defaultFooter,
         headInfo,
         {
-          errorMessage: message,
+          errorMessage: exception.response?.message ?? message,
         },
       );
       response.status(status).render('error', model);
     } else {
       response.status(status).json({
         statusCode: status,
-        message: message,
+        message: exception.response?.message ?? message,
+        timestamp: new Date().toISOString(),
       });
     }
   }

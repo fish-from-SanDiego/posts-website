@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Comment, Prisma } from '@prisma/client';
 import { Subject } from 'rxjs';
 import { conflict, notFound } from './exceptions';
+import { CreateCommentRawDto } from './dto/create-comment.raw.dto';
 
 export interface CommentDeletedEvent {
   commentId: number;
@@ -11,7 +11,7 @@ export interface CommentDeletedEvent {
 }
 
 export interface CommentCreatedEvent {
-  comment: Awaited<ReturnType<typeof CommentService.prototype.createComment>>;
+  comment: any;
 }
 
 @Injectable()
@@ -19,8 +19,8 @@ export class CommentService {
   constructor(private prisma: PrismaService) {}
 
   public readonly pageSize = 10;
-  private commentsDeletionEvents = new Subject<CommentDeletedEvent>();
-  private commentsCreationEvents = new Subject<CommentCreatedEvent>();
+  public commentsDeletionEvents = new Subject<CommentDeletedEvent>();
+  public commentsCreationEvents = new Subject<CommentCreatedEvent>();
 
   public sendCommentDeletionObservable() {
     return this.commentsDeletionEvents.asObservable();
@@ -30,7 +30,7 @@ export class CommentService {
     return this.commentsCreationEvents.asObservable();
   }
 
-  async createComment(data: CreateCommentDto) {
+  async createComment(data: CreateCommentRawDto) {
     try {
       const res = await this.prisma.comment.create({
         data: {
@@ -60,6 +60,18 @@ export class CommentService {
         where: where,
         include: include,
       });
+    } catch (e) {
+      throw this.handleError(e);
+    }
+  }
+
+  async getCommentById(commentId: number) {
+    try {
+      const comment = await this.prisma.comment.findUnique({
+        where: { id: commentId },
+      });
+      if (comment == null) throw notFound();
+      return comment;
     } catch (e) {
       throw this.handleError(e);
     }
