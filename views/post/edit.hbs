@@ -1,5 +1,5 @@
 <div class="main__content">
-  <h1 class="form__title ">Создать пост</h1>
+  <h1 class="form__title ">Редактировать пост</h1>
   <form id="edit-post-form" class="form vertical-container__item">
     <div class="form__group">
       <label for="title" class="form__label">Заголовок:</label>
@@ -15,9 +15,9 @@
       <label class="form__label">Категории:</label>
       <div id="category-container">
         {{#if post.categoryNames}}
-          {{#each post.categoryNames}}
+          {{#each post.categories}}
             <div class="category-input">
-              <input value="{{this}}" type="text" name="categoryNames" class="form__input"
+              <input value="{{this.name}}" type="text" name="categoryNames" class="form__input"
                      placeholder="Введите категорию" required />
               <button type="button" class="form__btn-remove" onclick="removeCategory(this)">−</button>
             </div>
