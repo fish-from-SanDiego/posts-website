@@ -174,7 +174,7 @@ export class PostController {
           id: post.id,
           createdAt: post.createdAt,
           updatedAt:
-            post.updatedAt == post.createdAt ? post.updatedAt : undefined,
+            post.updatedAt !== post.createdAt ? post.updatedAt : undefined,
           categories: post.categories.map((cat) => cat.category),
           title: post.title,
           content: post.content,
