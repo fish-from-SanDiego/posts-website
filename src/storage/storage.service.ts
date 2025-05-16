@@ -29,7 +29,7 @@ export class StorageService {
   }
 
   getUserPictureSubPath(userId: number) {
-    return `profilePictures/${userId}`;
+    return `profilePictures/${userId}_${Date.now()}`;
   }
 
   getSubPath(pictureUrl: string) {

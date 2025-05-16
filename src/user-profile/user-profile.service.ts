@@ -67,6 +67,12 @@ export class UserProfileService {
   }
 
   async updatePicture(userProfile: UserProfileDto, file: Express.Multer.File) {
+    if (userProfile.user.pictureUrl != null) {
+      const oldSubPath = this.storageService.getSubPath(
+        userProfile.user.pictureUrl,
+      );
+      await this.storageService.deleteFile(oldSubPath);
+    }
     const subPath = this.storageService.getUserPictureSubPath(
       userProfile.userId,
     );
